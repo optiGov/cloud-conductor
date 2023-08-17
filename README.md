@@ -22,10 +22,26 @@ Install the composer dependencies.
 composer install
 ```
 
-### 3. Migrate Database
+### 3. Install the app
 
-Run the database migrations.
+Run app installation process which includes the database migrations.
 
 ```bash
-php artisan migrate
+php artisan app:migrate
+```
+
+### 4. NPM
+
+Install the npm dependencies and compile the assets.
+
+```bash
+npm install && npm run build
+```
+
+### 5. Start the app
+
+Start the app with the following command.
+
+```bash
+php artisan serve
 ```
