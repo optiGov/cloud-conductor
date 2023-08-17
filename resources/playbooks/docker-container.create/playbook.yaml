@@ -1,0 +1,34 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Create folder `{{uuid}}` in cloud-conductor directory"
+      file:
+        path: "/usr/local/share/cloud-conductor/containers/{{uuid}}"
+        state: directory
+        mode: 0755
+
+    - name: "Copy `./docker-compose.yaml` in `{{uuid}}` folder"
+      template:
+        src: "{{docker_compose_file}}"
+        dest: "/usr/local/share/cloud-conductor/containers/{{uuid}}/docker-compose.yaml"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0644
+
+    - name: "Remove cronjob `container-{{ uuid }}` if {{ daily_update }} id false"
+      become: true
+      ansible.builtin.cron:
+        name: "container-{{uuid}}"
+        state: absent
+      when: daily_update == false
+
+    - name: "Create cronjob `container-{{ uuid }}` at {{ daily_update_time }} if {{ daily_update }} is true"
+      become: true
+      ansible.builtin.cron:
+          name: "container-{{uuid}}"
+          minute: "{{ daily_update_time.split(':')[1] }}"
+          hour: "{{ daily_update_time.split(':')[0] }}"
+          job: "cd /usr/local/share/cloud-conductor/containers/{{uuid}} && docker compose down && docker compose up -d"
+          state: present
+      when: daily_update == true and daily_update_time is defined

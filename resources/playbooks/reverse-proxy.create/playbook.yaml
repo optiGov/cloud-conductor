@@ -1,0 +1,25 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Create folder `reverse-proxy` in home directory"
+      file:
+        path: "/usr/local/share/cloud-conductor/reverse-proxy"
+        state: directory
+        mode: 0755
+
+    - name: "Copy `./docker-compose.yaml` in `reverse-proxy` folder"
+      template:
+        src: "./docker-compose.yaml"
+        dest: "/usr/local/share/cloud-conductor/reverse-proxy/docker-compose.yaml"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0644
+
+    - name: "Copy `./additional.conf` in `reverse-proxy` folder"
+      template:
+        src: "./additional.conf"
+        dest: "/usr/local/share/cloud-conductor/reverse-proxy/additional.conf"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0644

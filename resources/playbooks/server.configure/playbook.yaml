@@ -1,0 +1,68 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Update and Upgrade apt packages as sudo on {{ host }}"
+      become: yes
+      apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 3600
+
+    - name: "Install strongswan-starter package via apt as sudo on {{ host }}"
+      become: yes
+      apt:
+        name: strongswan-starter
+        state: present
+
+    - name: "Install Docker repository key"
+      become: yes
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: "Ensure docker registry is available"
+      become: yes
+      apt_repository:
+        repo: 'deb https://download.docker.com/linux/ubuntu bionic stable'
+        state: present
+
+    - name: "Install docker and dependencies"
+      become: yes
+      apt:
+        name: docker-ce
+        update_cache: yes
+
+    - name: "Install unattended-upgrades package via apt as sudo on {{ host }}"
+      become: yes
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: "Configure unattended-upgrades package via apt as sudo on {{ host }}"
+      become: yes
+      template:
+        src: "./50unattended-upgrades"
+        dest: "/etc/apt/apt.conf.d/50unattended-upgrades"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Create `/usr/local/share/cloud-conductor` directory"
+      become: yes
+      file:
+        path: "/usr/local/share/cloud-conductor"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0755
+
+    - name: "Create `/usr/local/share/cloud-conductor/scripts` directory"
+      become: yes
+      file:
+        path: "/usr/local/share/cloud-conductor/scripts"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: 0755
+

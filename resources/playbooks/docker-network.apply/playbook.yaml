@@ -1,0 +1,12 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Create the network {{ docker_network_name }} if it does not exist"
+      become: true
+      docker_network:
+        name: "{{ docker_network_name }}"
+        state: present
+        ipam_config:
+          - subnet: "{{ docker_network_subnet | default('')}}"
+

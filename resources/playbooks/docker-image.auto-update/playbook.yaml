@@ -1,0 +1,30 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Create cronjob `image-{{ image }}` at {{ daily_update_time }} for image {{ image }} with authenticated user."
+      become: true
+      ansible.builtin.cron:
+          name: "image-{{ image }}"
+          minute: "{{ daily_update_time.split(':')[1] }}"
+          hour: "{{ daily_update_time.split(':')[0] }}"
+          job: "docker login -u {{ registry_username }} -p {{ registry_password }} {{ registry_url }} && docker pull {{ image }} && docker logout {{ registry_url }}"
+          state: present
+      when:
+        - daily_update == true and daily_update_time is defined
+        - registry_url is defined
+        - registry_username is defined
+        - registry_password is defined
+
+    - name: "Create cronjob `image-{{ image }}` at {{ daily_update_time }} for image {{ image }} with unauthenticated user."
+      become: true
+      ansible.builtin.cron:
+          name: "image-{{ image }}"
+          minute: "{{ daily_update_time.split(':')[1] }}"
+          hour: "{{ daily_update_time.split(':')[0] }}"
+          job: "docker pull {{ image }}"
+          state: present
+      when:
+        - daily_update == true and daily_update_time is defined
+        - registry_username is not defined
+        - registry_password is not defined

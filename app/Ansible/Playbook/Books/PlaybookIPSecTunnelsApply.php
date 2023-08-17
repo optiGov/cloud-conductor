@@ -1,0 +1,255 @@
+<?php
+
+namespace App\Ansible\Playbook\Books;
+
+use App\Ansible\Ansible;
+use App\Ansible\Playbook\Playbook;
+use App\Ansible\Process\Process;
+use App\Models\DockerImage;
+use App\Models\DockerNetwork;
+use App\Models\IPSecTunnel;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
+
+class PlaybookIPSecTunnelsApply extends Playbook
+{
+    /**
+     * @var string
+     */
+    protected string $directory = "ipsec-tunnels.apply";
+
+    protected string $ipsecConfFilePath;
+    protected string $ipsecSecretsFilePath;
+    protected string $netplanFilePath;
+    protected string $healthCheckFilePath;
+
+    /**
+     * @param Collection<IPSecTunnel> $tunnels
+     */
+    public function __construct(
+        protected Collection $tunnels
+    )
+    {
+        parent::__construct();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function prepare(Ansible $ansible, Process $process): static
+    {
+        // set variables
+        $ansible->variable("interfaces", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getVTIName())->toArray());
+        $ansible->variable("iptables_command", $this->getIpTablesCommands());
+
+        // build ipsec.conf
+        $this->buildIPSecConf($ansible, $process);
+
+        // build ipsec.secrets
+        $this->buildIPSecSecrets($ansible, $process);
+
+        // build netplan
+        $this->buildNetplan($ansible, $process);
+
+        // build health check script
+        $this->buildHealthCheckScript($ansible, $process);
+
+        // set variables
+        $ansible->variable("file_ipsec_conf", $this->ipsecConfFilePath);
+        $ansible->variable("file_ipsec_secrets", $this->ipsecSecretsFilePath);
+        $ansible->variable("file_netplan", $this->netplanFilePath);
+        $ansible->variable("file_health_check", $this->healthCheckFilePath);
+
+        // call parent method
+        return parent::prepare($ansible, $process);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(Ansible $ansible, Process $process): static
+    {
+        // delete files
+        $this->deleteFiles();
+
+        // call parent method
+        return parent::cleanup($ansible, $process);
+    }
+
+    /**
+     * @param Ansible $ansible
+     * @param Process $process
+     * @return void
+     */
+    private function buildIPSecConf(Ansible $ansible, Process $process)
+    {
+        $this->ipsecConfFilePath = $this->newTemporyFile();
+
+        // build ipsec.conf
+        $content = <<<EOF
+# ipsec.conf - strongSwan IPsec configuration file
+
+# basic configuration
+
+config setup
+        charondebug = "ike 2, net 1, knl 2, mgr 2, cfg 0, chd 2"
+
+# auto generated config by cloud conductor
+
+
+EOF;
+
+        // add tunnels
+        foreach ($this->tunnels as $tunnel) {
+            $content .= $tunnel->getIPSecConfigSection() . "\n";
+        }
+
+        // write file
+        File::put($this->ipsecConfFilePath, $content);
+    }
+
+    /**
+     * @param Ansible $ansible
+     * @param Process $process
+     * @return void
+     */
+    private function buildIPSecSecrets(Ansible $ansible, Process $process)
+    {
+        $this->ipsecSecretsFilePath = $this->newTemporyFile();
+
+        // build ipsec.secrets
+        $content = <<<EOF
+# ipsec.secrets - strongSwan IPsec secrets file
+
+# This file holds shared secrets or RSA private keys for authentication.
+
+# RSA private key for this host, authenticating it to any other host
+# which knows the public part.
+
+# auto generated secrets by cloud conductor
+
+
+EOF;
+
+        // add tunnels
+        foreach ($this->tunnels as $tunnel) {
+            $content .= $tunnel->getIPSecSecretsSection() . "\n";
+        }
+
+        // write file
+        File::put($this->ipsecSecretsFilePath, $content);
+    }
+
+    /**
+     * @param Ansible $ansible
+     * @param Process $process
+     * @return void
+     */
+    private function buildNetplan(Ansible $ansible, Process $process)
+    {
+        $this->netplanFilePath = $this->newTemporyFile();
+
+        // build netplan
+        $content = <<<EOF
+# this file describes the network interfaces available on your system
+
+# auto generated netplan by cloud conductor
+
+network:
+  version: 2
+  tunnels:
+
+EOF;
+
+        // add tunnels
+        foreach ($this->tunnels as $tunnel) {
+            $content .= $tunnel->getNetplanConfigSection() . "\n";
+        }
+
+        // write file
+        File::put($this->netplanFilePath, $content);
+
+    }
+
+    /**
+     * @param Ansible $ansible
+     * @param Process $process
+     * @return void
+     */
+    private function buildHealthCheckScript(Ansible $ansible, Process $process)
+    {
+        $this->healthCheckFilePath = $this->newTemporyFile();
+
+        // build netplan
+        $content = "#!/bin/bash\n";
+
+        // add tunnels
+        foreach ($this->tunnels as $tunnel) {
+            // skip if health check is disabled
+            if(!$tunnel->health_check_enabled){
+                continue;
+            }
+
+            $content .= <<<EOF
+# tunnel: {$tunnel->name}
+if ! {$tunnel->health_check_command}; then
+    ipsec down {$tunnel->name}
+    ipsec up {$tunnel->name}
+fi
+EOF;
+
+        }
+
+        // write file
+        File::put($this->healthCheckFilePath, $content);
+
+    }
+
+    /**
+     * @return void
+     */
+    private function deleteFiles(): void
+    {
+        File::delete($this->ipsecConfFilePath);
+        File::delete($this->ipsecSecretsFilePath);
+        File::delete($this->netplanFilePath);
+        File::delete($this->healthCheckFilePath);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getIpTablesCommands(): array
+    {
+        $commands = new Collection();
+
+        // remove POSTROUTING-CLOUD-CONDUCTOR chain
+        $commands->add("iptables -t nat -D POSTROUTING -j POSTROUTING-CLOUD-CONDUCTOR");
+        $commands->add("iptables -t nat -F POSTROUTING-CLOUD-CONDUCTOR");
+        $commands->add("iptables -t nat -X POSTROUTING-CLOUD-CONDUCTOR");
+
+        // remove FORWARD-CLOUD-CONDUCTOR chain
+        $commands->add("iptables -D FORWARD -j FORWARD-CLOUD-CONDUCTOR");
+        $commands->add("iptables -F FORWARD-CLOUD-CONDUCTOR");
+        $commands->add("iptables -X FORWARD-CLOUD-CONDUCTOR");
+
+        // create POSTROUTING-CLOUD-CONDUCTOR chain
+        $commands->add("iptables -t nat -N POSTROUTING-CLOUD-CONDUCTOR");
+        $commands->add("iptables -t nat -I POSTROUTING -j POSTROUTING-CLOUD-CONDUCTOR");
+
+        // create FORWARD-CLOUD-CONDUCTOR chain
+        $commands->add("iptables -N FORWARD-CLOUD-CONDUCTOR");
+        $commands->add("iptables -I FORWARD -j FORWARD-CLOUD-CONDUCTOR");
+
+        // add return rule to FORWARD chain
+        $commands->add("iptables -A FORWARD-CLOUD-CONDUCTOR -m state --state ESTABLISHED,RELATED -j RETURN");
+
+        // add rules to POSTROUTING-CLOUD-CONDUCTOR and FORWARD-CLOUD-CONDUCTOR chain
+        foreach ($this->tunnels as $tunnel) {
+            $tunnel->getIPTablesCommands()->each(fn(string $command) => $commands->add($command));
+        }
+
+        // return string
+        return $commands->toArray();
+    }
+}

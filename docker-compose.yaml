@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  # application
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: app
+    environment:
+      - APP_URL=http://localhost
+      - APP_KEY=base64:E6AjVzmS/ZVW/KhWlHiAOE3M9yIqpnfYhYOWheax33I=
+      - ADMIN_NAME=Julius
+      - ADMIN_MAIL=jul.tur@icloud.com
+      - ADMIN_PASSWORD=admin
+    ports:
+      - "80:80"
+    volumes:
+        - storage:/var/www/storage
+
+volumes:
+    storage:

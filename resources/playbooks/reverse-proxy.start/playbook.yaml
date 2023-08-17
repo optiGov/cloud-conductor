@@ -1,0 +1,15 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Stop docker compose file in `reverse-proxy` folder if it is running"
+      become: yes
+      command: "docker compose down"
+      args:
+        chdir: "/usr/local/share/cloud-conductor/reverse-proxy"
+
+    - name: "Run docker compose file in `reverse-proxy` folder"
+      become: yes
+      command: "docker compose up -d"
+      args:
+        chdir: "/usr/local/share/cloud-conductor/reverse-proxy"

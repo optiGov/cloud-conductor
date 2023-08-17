@@ -1,0 +1,36 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "{{ ansible_user }} Logs into a Docker registry if [registry_url], [registry_username] and [registry_password] argument is passed."
+      become: yes
+      docker_login:
+        registry_url: "{{ registry_url }}"
+        username: "{{ registry_username }}"
+        password: "{{ registry_password }}"
+        reauthorize: yes
+      when:
+        - registry_url is defined
+        - registry_username is defined
+        - registry_password is defined
+
+    - name: "Pull {{ image }} image"
+      become: yes
+      docker_image:
+        tag: "{{ image_tag | default('latest') }}"
+        name: "{{ image }}"
+        source: pull
+
+    - name: "Log out of Docker registry"
+      become: yes
+      docker_login:
+        registry_url: "{{ registry_url }}"
+        username: "{{ registry_username }}"
+        password: "{{ registry_password }}"
+        state: absent
+      when:
+        - registry_url is defined
+        - registry_username is defined
+        - registry_password is defined
+
+

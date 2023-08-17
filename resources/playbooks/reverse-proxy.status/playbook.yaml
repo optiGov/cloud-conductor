@@ -1,0 +1,13 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Check if `reverse-proxy` container is running"
+      become: yes
+      docker_container_info:
+        name: reverse-proxy
+      register: result
+
+    - name: "Print result in json format"
+      debug:
+        msg: "{{ result | to_nice_json }}"

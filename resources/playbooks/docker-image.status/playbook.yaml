@@ -1,0 +1,13 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Return status of {{ image }} image"
+      become: yes
+      docker_image_info:
+        name: "{{ image }}"
+      register: result
+
+    - name: "Print result in json format"
+      debug:
+        msg: "{{ result | to_nice_json }}"

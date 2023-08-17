@@ -1,0 +1,15 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Stop docker compose file in `{{uuid}}` folder if it is running"
+      become: yes
+      command: "docker compose down"
+      args:
+        chdir: "/usr/local/share/cloud-conductor/containers/{{uuid}}"
+
+    - name: "Run docker compose file in `{{uuid}}` folder"
+      become: yes
+      command: "docker compose up -d"
+      args:
+        chdir: "/usr/local/share/cloud-conductor/containers/{{uuid}}"

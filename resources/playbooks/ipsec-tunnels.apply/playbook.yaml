@@ -1,0 +1,84 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Delete interfaces {{ interfaces }} if they exist"
+      become: true
+      shell: "ip link del {{ item }}"
+      loop: "{{ interfaces }}"
+      ignore_errors: true
+
+
+    - name: "Copy `charon.conf` to `/etc/strongswan.d/charon.conf`"
+      become: true
+      template:
+        src: "charon.conf"
+        dest: "/etc/strongswan.d/charon.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Copy `ipsec.conf` from {{ file_ipsec_conf }} to `/etc/ipsec.conf`"
+      become: true
+      template:
+        src: "{{ file_ipsec_conf }}"
+        dest: "/etc/ipsec.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Copy `ipsec.secrets` from {{ file_ipsec_secrets }} to `/etc/ipsec.secrets`"
+      become: true
+      template:
+          src: "{{ file_ipsec_secrets }}"
+          dest: "/etc/ipsec.secrets"
+          owner: root
+          group: root
+          mode: 0600
+
+    - name: "Copy `cloud-conductor.yaml` from {{ file_netplan }} to `/etc/netplan/01-cloud-conductor.yaml`"
+      become: true
+      template:
+          src: "{{ file_netplan }}"
+          dest: "/etc/netplan/01-cloud-conductor.yaml"
+          owner: root
+          group: root
+          mode: 0644
+
+    - name: "Apply strongswan configuration and read secrets"
+      become: true
+      shell: "ipsec update && ipsec rereadsecrets"
+      register: strongswan_restart
+
+    - name: "Generate and apply new netplan configuration"
+      become: true
+      shell: "netplan generate && netplan apply"
+      register: netplan_restart
+
+    - name: "Run iptables command `{{ item }}`"
+      become: true
+      shell: "{{ item }}"
+      loop: "{{ iptables_command }}"
+      when: iptables_command is defined
+
+    - name: "Restart systemd-networkd"
+      become: true
+      shell: "systemctl restart systemd-networkd"
+      register: systemd_networkd_restart
+
+    - name: "Copy `ipsec-tunnel-health-check.sh` script from {{ file_health_check }} to `/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh`"
+      become: true
+      template:
+        src: "{{ file_health_check }}"
+        dest: "/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Create cronjob `ipsec-tunnel-health-check` every 30 minutes"
+      become: true
+      ansible.builtin.cron:
+          name: "ipsec-tunnel-health-check"
+          minute: "*/30"
+          job: "/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
+          state: present
