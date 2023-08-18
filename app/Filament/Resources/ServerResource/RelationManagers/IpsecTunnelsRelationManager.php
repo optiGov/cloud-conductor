@@ -86,7 +86,7 @@ class IpsecTunnelsRelationManager extends RelationManager
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make("ike_hash")
-                            ->default("sha256")
+                            ->default("sha2_512")
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make("ike_dh_group")
@@ -121,7 +121,7 @@ class IpsecTunnelsRelationManager extends RelationManager
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make("esp_hash")
-                            ->default("sha256")
+                            ->default("sha2_512")
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make("esp_dh_group")

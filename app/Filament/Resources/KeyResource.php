@@ -117,9 +117,10 @@ class KeyResource extends Resource
                     ->label("UUID")
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\CheckboxColumn::make('encrypted')
+                Tables\Columns\IconColumn::make('encrypted')
                     ->label("Key file encrypted")
-                    ->disabled(true)
+                    ->boolean()
+                    ->searchable()
                     ->sortable(),
             ])
             ->filters([

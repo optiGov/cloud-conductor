@@ -78,6 +78,10 @@ class DockerImagesRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('image'),
+                Tables\Columns\IconColumn::make('daily_update')
+                    ->boolean()
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('username'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->formatStateUsing(fn(string $state) => Carbon::make($state)->diffForHumans()),

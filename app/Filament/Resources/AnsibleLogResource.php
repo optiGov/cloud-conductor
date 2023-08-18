@@ -79,7 +79,8 @@ class AnsibleLogResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\BooleanColumn::make('success')
+                Tables\Columns\IconColumn::make('success')
+                    ->boolean()
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')

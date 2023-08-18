@@ -6,6 +6,7 @@ use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDocke
 use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersCreate;
 use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersStart;
 use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersStop;
+use App\Models\DockerContainer;
 use App\Models\DockerNetwork;
 use App\Models\Key;
 use App\Models\Server;
@@ -205,7 +206,8 @@ class DockerContainersRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('dockerImage.image'),
+                Tables\Columns\TextColumn::make('hostname')
+                    ->url(fn(DockerContainer $record) => "http://{$record->hostname}", true),
             ])
             ->filters([
                 //
