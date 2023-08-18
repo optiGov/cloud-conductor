@@ -8,7 +8,6 @@
       loop: "{{ interfaces }}"
       ignore_errors: true
 
-
     - name: "Copy `charon.conf` to `/etc/strongswan.d/charon.conf`"
       become: true
       template:
@@ -82,3 +81,15 @@
           minute: "*/30"
           job: "/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
           state: present
+
+    - name: "Close tunnels"
+      become: true
+      shell: "ipsec down {{ item }}"
+      loop: "{{ tunnels }}"
+      ignore_errors: true
+
+    - name: "Open tunnels"
+      become: true
+      shell: "ipsec up {{ item }}"
+      loop: "{{ tunnels }}"
+      ignore_errors: true

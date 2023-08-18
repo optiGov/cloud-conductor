@@ -71,6 +71,14 @@ class IPSecTunnel extends Model
     /**
      * @return string
      */
+    public function getTunnelName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
     public function getMark(): string
     {
         return "10{$this->id}";
@@ -87,7 +95,7 @@ class IPSecTunnel extends Model
 
         return <<<EOF
 # tunnel: {$this->name}
-{$localIdentifier} {$remoteIdentifier}: PSK "{$this->psk}"
+{$localIdentifier} {$remoteIdentifier} : PSK "{$this->psk}"
 EOF;
     }
 
@@ -98,7 +106,7 @@ EOF;
     public function getIPSecConfigSection(): string
     {
         return <<<EOF
-conn {$this->name}:
+conn {$this->name}
         keyexchange=ike{$this->ike_version}
         ike={$this->ike_encryption}-{$this->ike_hash}-{$this->ike_dh_group}
         esp={$this->esp_encryption}-{$this->esp_hash}-{$this->esp_dh_group}

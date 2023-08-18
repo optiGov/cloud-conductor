@@ -91,7 +91,8 @@ class DockerContainer extends Model
         }
 
         // build appNetworks
-        $appNetworks = "";
+        $appNetworks = (empty($this->networks) && !$this->hostname) ? "" : "    networks:\n";
+        $appNetworks .= !$this->hostname ? "" : "      # reverse proxy network\n      reverse-proxy_container-network:\n";
         foreach ($this->networks as $data) {
             $network = DockerNetwork::find($data["network"]);
             $ipAddress = $data["ip_address"] ?? null;
@@ -169,7 +170,7 @@ version: "3.8"
 services:
   # application
   app:
-    # use GitHub image
+    # image of the container
     image: {$this->dockerImage->image}
     # always restart the container to prevent downtimes
     restart: {$this->restart_policy}
@@ -178,9 +179,6 @@ services:
     # mount volumes
 $appVolumes
     # connect to networks
-    networks:
-      # reverse proxy network
-      reverse-proxy_container-network:
 $appNetworks
     # configure reverse proxy
     environment:
