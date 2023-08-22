@@ -21,7 +21,8 @@ class PlaybookIPSecTunnelsApply extends Playbook
     protected string $ipsecConfFilePath;
     protected string $ipsecSecretsFilePath;
     protected string $netplanFilePath;
-    protected string $healthCheckFilePath;
+    protected string $healthCheckScriptFilePath;
+    protected string $iptablesPersistentScriptFilePath;
 
     /**
      * @param Collection<IPSecTunnel> $tunnels
@@ -42,7 +43,7 @@ class PlaybookIPSecTunnelsApply extends Playbook
         $ansible->variable("interfaces", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getVTIName())->toArray());
         $ansible->variable("tunnels", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getTunnelName())->toArray());
         $ansible->variable("iptables_command", $this->getIpTablesCommands());
-        
+
         // build ipsec.conf
         $this->buildIPSecConf($ansible, $process);
 
@@ -55,11 +56,15 @@ class PlaybookIPSecTunnelsApply extends Playbook
         // build health check script
         $this->buildHealthCheckScript($ansible, $process);
 
+        // build health check script
+        $this->buildIptablesPersistentScript($ansible, $process);
+
         // set variables
         $ansible->variable("file_ipsec_conf", $this->ipsecConfFilePath);
         $ansible->variable("file_ipsec_secrets", $this->ipsecSecretsFilePath);
         $ansible->variable("file_netplan", $this->netplanFilePath);
-        $ansible->variable("file_health_check", $this->healthCheckFilePath);
+        $ansible->variable("file_health_check", $this->healthCheckScriptFilePath);
+        $ansible->variable("file_iptables_persistent", $this->iptablesPersistentScriptFilePath);
 
         // call parent method
         return parent::prepare($ansible, $process);
@@ -179,9 +184,9 @@ EOF;
      */
     private function buildHealthCheckScript(Ansible $ansible, Process $process)
     {
-        $this->healthCheckFilePath = $this->newTemporyFile();
+        $this->healthCheckScriptFilePath = $this->newTemporyFile();
 
-        // build netplan
+        // build script
         $content = "#!/bin/bash\n";
 
         // add tunnels
@@ -202,8 +207,31 @@ EOF;
         }
 
         // write file
-        File::put($this->healthCheckFilePath, $content);
+        File::put($this->healthCheckScriptFilePath, $content);
 
+    }
+
+    /**
+     * @param Ansible $ansible
+     * @param Process $process
+     * @return void
+     */
+    private function buildIptablesPersistentScript(Ansible $ansible, Process $process)
+    {
+        $this->iptablesPersistentScriptFilePath = $this->newTemporyFile();
+
+        // build script
+        $content = "#!/bin/bash\n";
+
+        // add commands
+        $commands = $this->getIpTablesCommands();
+
+        foreach ($commands as $command) {
+            $content .= $command . "\n";
+        }
+
+        // write file
+        File::put($this->iptablesPersistentScriptFilePath, $content);
     }
 
     /**
@@ -214,7 +242,8 @@ EOF;
         File::delete($this->ipsecConfFilePath);
         File::delete($this->ipsecSecretsFilePath);
         File::delete($this->netplanFilePath);
-        File::delete($this->healthCheckFilePath);
+        File::delete($this->healthCheckScriptFilePath);
+        File::delete($this->iptablesPersistentScriptFilePath);
     }
 
     /**

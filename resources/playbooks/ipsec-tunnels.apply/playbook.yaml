@@ -29,20 +29,20 @@
     - name: "Copy `ipsec.secrets` from {{ file_ipsec_secrets }} to `/etc/ipsec.secrets`"
       become: true
       template:
-          src: "{{ file_ipsec_secrets }}"
-          dest: "/etc/ipsec.secrets"
-          owner: root
-          group: root
-          mode: 0600
+        src: "{{ file_ipsec_secrets }}"
+        dest: "/etc/ipsec.secrets"
+        owner: root
+        group: root
+        mode: 0600
 
     - name: "Copy `cloud-conductor.yaml` from {{ file_netplan }} to `/etc/netplan/01-cloud-conductor.yaml`"
       become: true
       template:
-          src: "{{ file_netplan }}"
-          dest: "/etc/netplan/01-cloud-conductor.yaml"
-          owner: root
-          group: root
-          mode: 0644
+        src: "{{ file_netplan }}"
+        dest: "/etc/netplan/01-cloud-conductor.yaml"
+        owner: root
+        group: root
+        mode: 0644
 
     - name: "Apply strongswan configuration and read secrets"
       become: true
@@ -77,10 +77,27 @@
     - name: "Create cronjob `ipsec-tunnel-health-check` every 30 minutes"
       become: true
       ansible.builtin.cron:
-          name: "ipsec-tunnel-health-check"
-          minute: "*/30"
-          job: "/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
-          state: present
+        name: "ipsec-tunnel-health-check"
+        minute: "*/30"
+        job: "/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
+        state: present
+
+    - name: "Copy `iptables-persistent.sh` script from {{ file_iptables_persistent }} to `/usr/local/share/cloud-conductor/scripts/iptables-persistent.sh`"
+      become: true
+      template:
+        src: "{{ file_iptables_persistent }}"
+        dest: "/usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Create cronjob `iptables-persistent` at reboot"
+      become: true
+      ansible.builtin.cron:
+        name: "iptables-persistent"
+        special_time: reboot
+        job: "/usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
+        state: present
 
     - name: "Close tunnels"
       become: true
