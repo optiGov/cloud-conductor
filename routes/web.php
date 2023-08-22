@@ -13,5 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::redirect('/', '/admin/keys');
-Route::redirect('/admin', '/admin/keys');
+Route::redirect('/', '/admin/servers');
+Route::redirect('/admin', '/admin/servers');
