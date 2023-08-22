@@ -20,6 +20,7 @@
         tag: "{{ image_tag | default('latest') }}"
         name: "{{ image }}"
         source: pull
+        force_source: true
 
     - name: "Log out of Docker registry"
       become: yes
