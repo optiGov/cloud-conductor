@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Models\Key;
+use Exception;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -10,13 +11,24 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Table;
+use Filament\Tables\Actions\BulkAction;
 
-abstract class ActionRM {
+abstract class ActionRM
+{
     /**
      * @param Table $table
      * @return Action
      */
     abstract public static function make(Table $table): Action;
+
+    /**
+     * @return BulkAction
+     * @throws Exception
+     */
+    public static function makeBulk(): BulkAction
+    {
+        throw new Exception("Bulk actions are not supported for this action.");
+    }
 
     /**
      * @return Component
