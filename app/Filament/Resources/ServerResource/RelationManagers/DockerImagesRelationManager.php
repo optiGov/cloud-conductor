@@ -97,7 +97,6 @@ class DockerImagesRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-            ]);
+            ->bulkActions([]);
     }
 }

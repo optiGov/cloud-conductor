@@ -129,9 +129,7 @@ class KeyResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                // no bulk actions for keys
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array

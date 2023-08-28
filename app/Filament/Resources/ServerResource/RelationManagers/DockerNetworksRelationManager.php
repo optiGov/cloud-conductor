@@ -64,7 +64,6 @@ class DockerNetworksRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-            ]);
+            ->bulkActions([]);
     }
 }
