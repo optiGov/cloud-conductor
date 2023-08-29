@@ -201,6 +201,16 @@ class DockerContainersRelationManager extends RelationManager
         return false;
     }
 
+    protected function getTableRecordsPerPage(): int
+    {
+        return 50;
+    }
+
+    protected function getTableRecordsPerPageSelectOptions(): array
+    {
+        return [10, 25, 50, 100, 250, 500, 1000];
+    }
+
     public static function table(Table $table): Table
     {
         return $table
