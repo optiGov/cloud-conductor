@@ -204,6 +204,9 @@ if ! {$tunnel->health_check_command}; then
 fi
 EOF;
 
+            // append newline
+            $content .= "\n";
+
         }
 
         // write file
