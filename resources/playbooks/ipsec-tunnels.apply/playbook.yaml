@@ -96,7 +96,7 @@
       ansible.builtin.cron:
         name: "iptables-persistent"
         special_time: reboot
-        job: "/usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
+        job: "sh /usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
         state: present
 
     - name: "Close tunnels"
