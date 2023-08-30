@@ -192,7 +192,7 @@ EOF;
         // add tunnels
         foreach ($this->tunnels as $tunnel) {
             // skip if health check is disabled
-            if(!$tunnel->health_check_enabled){
+            if (!$tunnel->health_check_enabled) {
                 continue;
             }
 
@@ -227,7 +227,7 @@ EOF;
         $content = "#!/bin/bash\n";
 
         // add commands
-        $commands = $this->getIpTablesCommands();
+        $commands = $this->getIpTablesCommands(false);
 
         foreach ($commands as $command) {
             $content .= $command . "\n";
@@ -250,21 +250,24 @@ EOF;
     }
 
     /**
+     * @param bool $includeDroppingChains
      * @return array
      */
-    protected function getIpTablesCommands(): array
+    protected function getIpTablesCommands(bool $includeDroppingChains = true): array
     {
         $commands = new Collection();
 
-        // remove POSTROUTING-CLOUD-CONDUCTOR chain
-        $commands->add("iptables -t nat -D POSTROUTING -j POSTROUTING-CLOUD-CONDUCTOR");
-        $commands->add("iptables -t nat -F POSTROUTING-CLOUD-CONDUCTOR");
-        $commands->add("iptables -t nat -X POSTROUTING-CLOUD-CONDUCTOR");
+        if ($includeDroppingChains) {
+            // remove POSTROUTING-CLOUD-CONDUCTOR chain
+            $commands->add("iptables -t nat -D POSTROUTING -j POSTROUTING-CLOUD-CONDUCTOR");
+            $commands->add("iptables -t nat -F POSTROUTING-CLOUD-CONDUCTOR");
+            $commands->add("iptables -t nat -X POSTROUTING-CLOUD-CONDUCTOR");
 
-        // remove FORWARD-CLOUD-CONDUCTOR chain
-        $commands->add("iptables -D FORWARD -j FORWARD-CLOUD-CONDUCTOR");
-        $commands->add("iptables -F FORWARD-CLOUD-CONDUCTOR");
-        $commands->add("iptables -X FORWARD-CLOUD-CONDUCTOR");
+            // remove FORWARD-CLOUD-CONDUCTOR chain
+            $commands->add("iptables -D FORWARD -j FORWARD-CLOUD-CONDUCTOR");
+            $commands->add("iptables -F FORWARD-CLOUD-CONDUCTOR");
+            $commands->add("iptables -X FORWARD-CLOUD-CONDUCTOR");
+        }
 
         // create POSTROUTING-CLOUD-CONDUCTOR chain
         $commands->add("iptables -t nat -N POSTROUTING-CLOUD-CONDUCTOR");

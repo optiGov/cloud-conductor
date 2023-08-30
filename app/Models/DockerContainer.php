@@ -162,6 +162,16 @@ class DockerContainer extends Model
         $volumes = empty($this->volumes) ? "" : "volumes:\n";
         foreach ($this->volumes as $host => $container) {
             $volumes .= "  $host:\n";
+
+            // check if $host contains a uuid and references another DockerContainer's volume
+            if (Str::contains($host, "_")) {
+                $uuid = Str::before($host, "_");
+                $container = DockerContainer::where("uuid", $uuid)->first();
+                if ($container) {
+                    $volumes .= "    external: true\n";
+                    $volumes .= "    name: $host\n";
+                }
+            }
         }
 
         // return docker-compose content
