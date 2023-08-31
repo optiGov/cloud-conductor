@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 use App\Ansible\Ansible;
 use App\Ansible\Playbook\Books\PlaybookDockerImagePull;
 use App\Ansible\Playbook\Books\PlaybookIPSecTunnelsApply;
+use App\Ansible\Playbook\Books\PlaybookIPSecTunnelsStart;
 use App\Ansible\Playbook\Books\PlaybookServerCommand;
 use App\Models\Key;
 use App\Models\Server;
@@ -14,8 +15,9 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 
-class ActionRMIPSecTunnelsApply extends ActionRM
+class ActionRMIPSecTunnelsStart extends ActionRM
 {
 
     /**
@@ -23,28 +25,28 @@ class ActionRMIPSecTunnelsApply extends ActionRM
      */
     public static function make(Table $table): Action
     {
-        return Action::make("Apply IPSec Tunnels")
-            ->icon("heroicon-o-document-text")
+        return Action::make("Start IPSec Tunnels")
+            ->icon("heroicon-o-play")
             ->requiresConfirmation()
-            ->label("Apply IPSec Tunnels")
-            ->modalHeading("Apply IPSec Tunnels")
-            ->modalSubheading("Confirm to apply the configured IPSec Tunnels.")
+            ->label("Start IPSec Tunnels")
+            ->modalHeading("Start IPSec Tunnels")
+            ->modalSubheading("Confirm to start the configured IPSec Tunnels.")
             ->form([static::makeKeyPasswordGrid()])
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
-                $ipsecTunnels = $server->ipsecTunnels;
+                $ipsecTunnels = $livewire->getMountedTableActionRecord() ? new Collection([$livewire->getMountedTableActionRecord()]) : $server->ipsecTunnels;
                 $key = Key::findOrFail($data["key"]);
 
                 $ansible = new Ansible();
-                $result = $ansible->play(new PlaybookIPSecTunnelsApply($ipsecTunnels))
+                $result = $ansible->play(new PlaybookIPSecTunnelsStart($ipsecTunnels))
                     ->on($server)
                     ->with($key, $data["password"])
                     ->execute();
 
                 if ($result->noAnsibleErrors()) {
-                    Filament::notify("success", "Successfully applied IPSec Tunnels.");
+                    Filament::notify("success", "Successfully started IPSec Tunnels.");
                 } else {
-                    Filament::notify("danger", "Failed to apply IPSec Tunnels.");
+                    Filament::notify("danger", "Failed to start IPSec Tunnels.");
                 }
             });
     }

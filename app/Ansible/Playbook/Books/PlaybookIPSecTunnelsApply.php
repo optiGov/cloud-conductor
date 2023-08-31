@@ -41,7 +41,6 @@ class PlaybookIPSecTunnelsApply extends Playbook
     {
         // set variables
         $ansible->variable("interfaces", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getVTIName())->toArray());
-        $ansible->variable("tunnels", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getTunnelName())->toArray());
         $ansible->variable("iptables_command", $this->getIpTablesCommands());
 
         // build ipsec.conf

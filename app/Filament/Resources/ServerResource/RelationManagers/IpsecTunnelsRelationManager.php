@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
 use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMIPSecTunnelsApply;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMIPSecTunnelsStart;
 use App\Models\DockerNetwork;
 use App\Models\Server;
 use Filament\Forms;
@@ -217,11 +218,12 @@ class IpsecTunnelsRelationManager extends RelationManager
             ])
             ->headerActions([
                 ActionRMIPSecTunnelsApply::make($table),
+                ActionRMIPSecTunnelsStart::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ActionRMIPSecTunnelsStart::make($table)
             ])
             ->bulkActions([]);
     }

@@ -98,15 +98,3 @@
         special_time: reboot
         job: "sh /usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
         state: present
-
-    - name: "Close tunnels"
-      become: true
-      shell: "ipsec down {{ item }}"
-      loop: "{{ tunnels }}"
-      ignore_errors: true
-
-    - name: "Open tunnels"
-      become: true
-      shell: "ipsec up {{ item }}"
-      loop: "{{ tunnels }}"
-      ignore_errors: true
