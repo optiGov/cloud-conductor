@@ -223,7 +223,16 @@ EOF;
         $this->iptablesPersistentScriptFilePath = $this->newTemporyFile();
 
         // build script
-        $content = "#!/bin/bash\n";
+        $content = <<<EOF
+#!/bin/bash
+
+# wait for network to be ready
+sleep 30
+
+# run iptables commands
+
+EOF;
+;
 
         // add commands
         $commands = $this->getIpTablesCommands(false);
