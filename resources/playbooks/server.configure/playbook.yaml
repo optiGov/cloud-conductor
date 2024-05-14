@@ -66,3 +66,23 @@
         group: "{{ ansible_user }}"
         mode: 0755
 
+    - name: "Remove all but the first line which includes PasswordAuthentication from sshd_config"
+      become: yes
+      replace:
+        path: "/etc/ssh/sshd_config"
+        after: "PasswordAuthentication"
+        regexp: "^(.*)PasswordAuthentication(.*)$"
+        replace: ""
+
+    - name: "Replace the first line which includes PasswordAuthentication from sshd_config"
+      become: yes
+      replace:
+        path: "/etc/ssh/sshd_config"
+        regexp: "^(.*)PasswordAuthentication(.*)$"
+        replace: "PasswordAuthentication no"
+
+    - name: "Restart sshd"
+      become: yes
+      service:
+        name: sshd
+        state: restarted
