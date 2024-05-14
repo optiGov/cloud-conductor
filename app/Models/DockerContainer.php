@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
  * @property integer $deploy_resources_reservations_memory
  * @property boolean $daily_update
  * @property string $daily_update_time
+ * @property array $services
  * @property Server $server
  * @property DockerImage $dockerImage
  */
@@ -53,6 +54,7 @@ class DockerContainer extends Model
         "ports" => "array",
         "environment" => "array",
         "extra_hosts" => "array",
+        "services" => "array",
     ];
 
     /**
@@ -92,6 +94,7 @@ class DockerContainer extends Model
 
         // build appNetworks
         $appNetworks = (empty($this->networks) && !$this->hostname) ? "" : "    networks:\n";
+        $appNetworksServices = empty($this->networks) ? "" : "    networks:\n";
         $appNetworks .= !$this->hostname ? "" : "      # reverse proxy network\n      reverse-proxy_container-network:\n";
         foreach ($this->networks as $data) {
             $network = DockerNetwork::find($data["network"]);
@@ -99,6 +102,7 @@ class DockerContainer extends Model
 
             if ($network) {
                 $appNetworks .= "      {$network->getNetworkName()}:\n";
+                $appNetworksServices .= "      {$network->getNetworkName()}:\n";
                 if ($ipAddress) {
                     $appNetworks .= "        ipv4_address: $ipAddress\n";
                 }
@@ -174,6 +178,39 @@ class DockerContainer extends Model
             }
         }
 
+        // build service containers for docker compose
+        $services = '';
+        $serviceCommands = collect($this->services ?? []);
+        $serviceCommands->each(function ($command, $postfix) use (&$services, $appVolumes, $appNetworksServices, $environment, $ports, $extraHosts, $resources) {
+            $serviceName = Str::slug($postfix);
+            $containerName = $this->getContainerName() . '-' . $postfix;
+            $services .= <<<EOF
+  # $containerName
+  $serviceName:
+    # image of the container
+    image: {$this->dockerImage->image}
+    # always restart the container to prevent downtimes
+    restart: {$this->restart_policy}
+    # unique container name
+    container_name: $containerName
+    # start command for entrypoint
+    command: $command
+    # mount volumes
+$appVolumes
+    # connect to networks
+$appNetworksServices
+    # environment variables
+    environment:
+      - CLOUD_CONDUCTOR_SERVICE_NAME=$serviceName
+$environment
+    # extra hosts
+$extraHosts
+    # resource limits
+$resources
+
+EOF;
+        });
+
         // return docker-compose content
         return <<<EOF
 version: "3.8"
@@ -190,7 +227,7 @@ services:
 $appVolumes
     # connect to networks
 $appNetworks
-    # configure reverse proxy
+    # environment variables
     environment:
       - VIRTUAL_HOST={$this->hostname}
       - LETSENCRYPT_HOST={$this->hostname}
@@ -202,6 +239,9 @@ $ports
 $extraHosts
     # resource limits
 $resources
+
+# additional service containers
+$services
 
 # network configuration
 networks:
