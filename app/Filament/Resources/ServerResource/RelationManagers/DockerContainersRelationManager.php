@@ -73,6 +73,21 @@ class DockerContainersRelationManager extends RelationManager
                                     ->hint("The hostname the container will be accessible from. Make sure to add this to your DNS records."),
                             ])
                     ]),
+                Forms\Components\Section::make("Additional Services")
+                    ->compact()
+                    ->collapsible()
+                    ->collapsed()
+                    ->schema([
+                        KeyValue::make("services")
+                            ->hint("If you want to run a container multiple times with different commands, you can add these services here. These containers will not be in the reverse proxy network.")
+                            ->label("")
+                            ->keyLabel("Container Postfix")
+                            ->keyPlaceholder("Service")
+                            ->valueLabel("Command")
+                            ->valuePlaceholder("arg1 arg2")
+                            ->default([])
+                            ->reorderable()
+                    ]),
                 Forms\Components\Section::make("Auto Updates")
                     ->compact()
                     ->collapsible()
