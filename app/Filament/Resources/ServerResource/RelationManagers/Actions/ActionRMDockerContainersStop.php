@@ -27,7 +27,7 @@ class ActionRMDockerContainersStop extends ActionRM
     public static function make(Table $table): Action
     {
         return Action::make("Stop")
-            ->icon("heroicon-o-play")
+            ->icon("heroicon-o-stop")
             ->requiresConfirmation()
             ->label("Stop")
             ->modalHeading("Stop")
