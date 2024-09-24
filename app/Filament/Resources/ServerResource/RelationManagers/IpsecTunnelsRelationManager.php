@@ -184,7 +184,8 @@ class IpsecTunnelsRelationManager extends RelationManager
                                     ->required(),
                                 Forms\Components\TextInput::make("remote_network")
                                     ->placeholder("Remote Network")
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->required(),
                             ])
                             ->default([])
                             ->columns(2),
