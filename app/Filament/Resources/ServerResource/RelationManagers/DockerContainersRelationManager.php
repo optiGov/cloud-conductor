@@ -253,6 +253,7 @@ class DockerContainersRelationManager extends RelationManager
             ])
             ->bulkActions([
                 ActionRMDockerContainersStart::makeBulk(),
+                ActionRMDockerContainersCommand::makeBulk(),
             ]);
     }
 }
