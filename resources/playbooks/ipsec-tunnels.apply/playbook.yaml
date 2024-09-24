@@ -78,7 +78,7 @@
       become: true
       ansible.builtin.cron:
         name: "ipsec-tunnel-health-check"
-        minute: "*/30"
+        minute: "*/5"
         job: "sh /usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
         state: present
 
