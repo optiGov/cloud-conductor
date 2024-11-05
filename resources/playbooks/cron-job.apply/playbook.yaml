@@ -1,0 +1,15 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Applies the configuration for the cron job {{ cron_job_identifier }}"
+      become: true
+      ansible.builtin.cron:
+        name: "{{ cron_job_identifier }}"
+        job: "{{ cron_job_command }}"
+        disabled: "{{ cron_job_disabled }}"
+        minute: "{{ cron_job_minute }}"
+        hour: "{{ cron_job_hour }}"
+        day: "{{ cron_job_day }}"
+        state: "{{ cron_job_state }}"
+

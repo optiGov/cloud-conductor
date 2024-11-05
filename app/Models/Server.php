@@ -67,4 +67,11 @@ class Server extends Model
         return $this->hasMany(IPSecTunnel::class);
     }
 
+    /**
+     * @return HasMany
+     */
+    public function cronJobs(): HasMany
+    {
+        return $this->hasMany(CronJob::class);
+    }
 }

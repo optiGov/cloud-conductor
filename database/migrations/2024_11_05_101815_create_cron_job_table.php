@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string("hour")->nullable();
             $table->string("day")->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

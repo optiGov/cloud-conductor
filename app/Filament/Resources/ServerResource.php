@@ -88,6 +88,7 @@ class ServerResource extends Resource
             RelationManagers\DockerNetworksRelationManager::class,
             RelationManagers\DockerContainersRelationManager::class,
             RelationManagers\IPSecTunnelsRelationManager::class,
+            RelationManagers\CronJobsRelationManager::class,
         ];
     }
 
