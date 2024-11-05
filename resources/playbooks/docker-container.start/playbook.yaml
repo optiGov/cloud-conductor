@@ -4,7 +4,7 @@
 
     - name: "Stop docker compose file in `{{uuid}}` folder if it is running"
       become: yes
-      command: "docker compose down"
+      command: "docker compose down -t 1  "
       args:
         chdir: "/usr/local/share/cloud-conductor/containers/{{uuid}}"
 
