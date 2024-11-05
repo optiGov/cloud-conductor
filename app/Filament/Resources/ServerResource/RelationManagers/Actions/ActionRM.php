@@ -10,7 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkAction;
 
 abstract class ActionRM

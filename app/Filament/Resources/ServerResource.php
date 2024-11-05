@@ -15,9 +15,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -46,7 +46,7 @@ class ServerResource extends Resource
                             ->icon("heroicon-o-clock")
                             ->schema([ServerFormSchedules::make()]),
                         Tab::make("Reverse-Proxy")
-                            ->icon("heroicon-o-globe")
+                            ->icon('heroicon-o-globe-americas')
                             ->schema([ServerFormReverseProxy::make()]),
                     ])
             ]);

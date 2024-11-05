@@ -10,7 +10,7 @@ class EditAnsibleLog extends EditRecord
 {
     protected static string $resource = AnsibleLogResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\ViewAction::make(),

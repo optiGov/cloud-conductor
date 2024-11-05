@@ -10,7 +10,7 @@ use App\Models\Server;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Ramsey\Collection\Collection;
@@ -24,7 +24,7 @@ class ActionRMDockerContainersCommand extends ActionRM
     public static function make(Table $table): Action
     {
         return Action::make("Command")
-            ->icon("heroicon-o-terminal")
+            ->icon('heroicon-o-command-line')
             ->requiresConfirmation()
             ->label("Command")
             ->modalHeading("Command")
@@ -53,7 +53,7 @@ class ActionRMDockerContainersCommand extends ActionRM
     public static function makeBulk(): BulkAction
     {
         return BulkAction::make("Command")
-            ->icon("heroicon-o-terminal")
+            ->icon('heroicon-o-command-line')
             ->requiresConfirmation()
             ->label("Command")
             ->modalHeading("Command")

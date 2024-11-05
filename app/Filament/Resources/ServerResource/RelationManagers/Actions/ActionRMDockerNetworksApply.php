@@ -11,7 +11,7 @@ use App\Models\Server;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Relations\Relation;
 

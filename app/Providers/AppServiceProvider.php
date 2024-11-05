@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Filament\Facades\Filament;
+use Filament\Support\Assets\Css;
+use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,14 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // register styles and scripts
-        Filament::registerStyles([
-            asset('css/app.css'),
-        ]);
 
-        Filament::serving(function () {
-            // Using Vite
-            Filament::registerViteTheme('resources/css/cloud-conductor.css');
-        });
     }
 }

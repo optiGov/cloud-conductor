@@ -10,7 +10,7 @@ use App\Models\Server;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -23,7 +23,7 @@ class ActionRMDockerImagesPull extends ActionRM
     public static function make(Table $table): Action
     {
         return Action::make("Pull Docker Images")
-            ->icon("heroicon-o-cloud-download")
+            ->icon('heroicon-o-cloud-arrow-down')
             ->requiresConfirmation()
             ->label("Pull Docker Images")
             ->modalHeading("Pull Docker Images")

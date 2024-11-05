@@ -22,7 +22,7 @@ class ActionServerCommand extends ActionServer
     public static function make(EditRecord $context): Action
     {
         return Action::make("Command")
-            ->icon("heroicon-o-terminal")
+            ->icon('heroicon-o-command-line')
             ->requiresConfirmation()
             ->modalHeading("Run Command on Server")
             ->modalSubheading("Enter the command you want to run on the server and confirm.")

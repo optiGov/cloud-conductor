@@ -13,9 +13,9 @@ use App\Models\Server;
 use Filament\Forms;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +30,7 @@ class DockerContainersRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -216,7 +216,7 @@ class DockerContainersRelationManager extends RelationManager
         return false;
     }
 
-    protected function getTableRecordsPerPage(): int
+    public function getTableRecordsPerPage(): int
     {
         return 50;
     }
@@ -226,7 +226,7 @@ class DockerContainersRelationManager extends RelationManager
         return [10, 25, 50, 100, 250, 500, 1000];
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -12,7 +12,7 @@ class EditKey extends EditRecord
 {
     protected static string $resource = KeyResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             // delete
@@ -21,7 +21,7 @@ class EditKey extends EditRecord
             }),
             // encrypt
             Actions\Action::make('Unencrypted key file')
-                ->icon('heroicon-o-exclamation')
+                ->icon('heroicon-o-exclamation-triangle')
                 ->action(function() {
                     $this->record->encryptKey($this->mountedActionData["password"]);
                     $this->notify("success", "Key encrypted successfully.");
@@ -52,7 +52,7 @@ class EditKey extends EditRecord
                         $this->notify("danger", "The password you entered is incorrect.");
                     }
                 })
-                ->color("secondary")
+                ->color("gray")
                 ->requiresConfirmation()
                 ->modalSubheading("Are you sure you want to decrypt this key? An unencrypted key file is a security risk.")
                 ->form([
