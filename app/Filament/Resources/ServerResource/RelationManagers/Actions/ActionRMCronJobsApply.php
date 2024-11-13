@@ -50,12 +50,12 @@ class ActionRMCronJobsApply extends ActionRM
 
                     if ($result->noAnsibleErrors()) {
                         Notification::make()
-                            ->title("Created cron job [{$cronjob->name}]")
+                            ->title("Created cron job [{$cronjob->name}].")
                             ->success()
                             ->send();
                     } else {
                         Notification::make()
-                            ->title("Failed to create cron job [{$cronjob->name}]")
+                            ->title("Failed to create cron job [{$cronjob->name}].")
                             ->danger()
                             ->send();
                     }

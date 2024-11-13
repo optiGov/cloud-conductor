@@ -12,6 +12,7 @@ use App\Ansible\Playbook\Books\PlaybookServerCommand;
 use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
@@ -48,9 +49,15 @@ class ActionRMDockerContainersStop extends ActionRM
 
 
                     if ($result->noAnsibleErrors()) {
-                        Filament::notify("success", "Stopped container [{$container->name}]");
+                        Notification::make()
+                            ->title("Stopped container [{$container->name}].")
+                            ->success()
+                            ->send();
                     } else {
-                        Filament::notify("danger", "[{$container->name}]: " . $result->getLog()->first_error_message);
+                        Notification::make()
+                            ->title("[{$container->name}]: " . $result->getLog()->first_error_message)
+                            ->danger()
+                            ->send();
                     }
                 }
             });

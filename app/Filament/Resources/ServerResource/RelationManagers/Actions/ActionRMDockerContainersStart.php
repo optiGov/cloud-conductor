@@ -12,6 +12,7 @@ use App\Models\DockerContainer;
 use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
@@ -88,9 +89,15 @@ class ActionRMDockerContainersStart extends ActionRM
             ->execute();
 
         if ($result->noAnsibleErrors()) {
-            Filament::notify("success", "(Re-)Started container [{$container->name}]");
+            Notification::make()
+                ->title("Started container [{$container->name}].")
+                ->success()
+                ->send();
         } else {
-            Filament::notify("danger", "[{$container->name}]: " . $result->getLog()->first_error_message);
+            Notification::make()
+                ->title("Stopped container [{$container->name}].")
+                ->danger()
+                ->send();
         }
     }
 }

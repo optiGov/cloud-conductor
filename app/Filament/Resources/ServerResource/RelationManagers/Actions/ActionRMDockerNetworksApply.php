@@ -9,6 +9,7 @@ use App\Ansible\Playbook\Books\PlaybookServerCommand;
 use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
@@ -44,9 +45,15 @@ class ActionRMDockerNetworksApply extends ActionRM
                         ->execute();
 
                     if ($result->noAnsibleErrors()) {
-                        Filament::notify("success", "Created network [{$network->name}]");
+                        Notification::make()
+                            ->title("Created network [{$network->name}].")
+                            ->success()
+                            ->send();
                     } else {
-                        Filament::notify("danger", "Failed to create network [{$network->name}]");
+                        Notification::make()
+                            ->title("Failed to create network [{$network->name}].")
+                            ->danger()
+                            ->send();
                     }
                 }
             });

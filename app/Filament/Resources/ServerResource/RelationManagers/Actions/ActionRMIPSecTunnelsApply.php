@@ -9,6 +9,7 @@ use App\Ansible\Playbook\Books\PlaybookServerCommand;
 use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
@@ -42,9 +43,15 @@ class ActionRMIPSecTunnelsApply extends ActionRM
                     ->execute();
 
                 if ($result->noAnsibleErrors()) {
-                    Filament::notify("success", "Successfully applied IPSec Tunnels.");
+                    Notification::make()
+                        ->title("Applied IPSec Tunnels.")
+                        ->success()
+                        ->send();
                 } else {
-                    Filament::notify("danger", "Failed to apply IPSec Tunnels.");
+                    Notification::make()
+                        ->title("Failed to apply IPSec Tunnels.")
+                        ->danger()
+                        ->send();
                 }
             });
     }

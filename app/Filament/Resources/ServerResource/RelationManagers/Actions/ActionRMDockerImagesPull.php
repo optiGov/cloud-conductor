@@ -8,6 +8,7 @@ use App\Ansible\Playbook\Books\PlaybookServerCommand;
 use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
@@ -43,9 +44,15 @@ class ActionRMDockerImagesPull extends ActionRM
                         ->execute();
 
                     if ($result->noAnsibleErrors()) {
-                        Filament::notify("success", "Pulled image [{$image->image}]");
+                        Notification::make()
+                            ->title("Pulled image [{$image->image}].")
+                            ->success()
+                            ->send();
                     } else {
-                        Filament::notify("danger", "Failed to pull image [{$image->image}]");
+                        Notification::make()
+                            ->title("Failed to pull image [{$image->image}].")
+                            ->success()
+                            ->send();
                     }
                 }
             });

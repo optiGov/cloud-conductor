@@ -10,6 +10,7 @@ use App\Ansible\Playbook\Books\PlaybookServerCommand;
 use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
@@ -44,9 +45,15 @@ class ActionRMIPSecTunnelsStart extends ActionRM
                     ->execute();
 
                 if ($result->noAnsibleErrors()) {
-                    Filament::notify("success", "Successfully started IPSec Tunnels.");
+                    Notification::make()
+                        ->title("Started IPSec Tunnels.")
+                        ->success()
+                        ->send();
                 } else {
-                    Filament::notify("danger", "Failed to start IPSec Tunnels.");
+                    Notification::make()
+                        ->title("Failed to start IPSec Tunnels.")
+                        ->danger()
+                        ->send();
                 }
             });
     }

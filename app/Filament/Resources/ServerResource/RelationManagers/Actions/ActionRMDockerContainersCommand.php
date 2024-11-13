@@ -9,6 +9,7 @@ use App\Models\Key;
 use App\Models\Server;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
@@ -95,9 +96,15 @@ class ActionRMDockerContainersCommand extends ActionRM
             ->execute();
 
         if ($result->noAnsibleErrors()) {
-            Filament::notify("success", "[{$container->name}]: " . $result->getLog()->first_success_message);
+            Notification::make()
+                ->title("[{$container->name}]: " . $result->getLog()->first_success_message)
+                ->success()
+                ->send();
         } else {
-            Filament::notify("danger", "[{$container->name}]: " . $result->getLog()->first_error_message);
+            Notification::make()
+                ->title("[{$container->name}]: " . $result->getLog()->first_error_message)
+                ->success()
+                ->send();
         }
     }
 }
