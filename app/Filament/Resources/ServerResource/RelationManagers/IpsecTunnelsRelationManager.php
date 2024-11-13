@@ -77,6 +77,10 @@ class IpsecTunnelsRelationManager extends RelationManager
                             ->default("0.0.0.0/0")
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\Checkbox::make("separate_connections")
+                            ->columnSpanFull()
+                            ->label("Separate Connections")
+                            ->hint("If enabled, a separate tunnel config for each remote subnet will be created."),
                     ]),
                 Forms\Components\Section::make("Encryption, Hashing and Diffie-Hellman-Group")
                     ->compact()
