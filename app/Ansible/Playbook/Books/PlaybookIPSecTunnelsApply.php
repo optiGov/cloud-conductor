@@ -195,11 +195,24 @@ EOF;
                 continue;
             }
 
+            $commands = '';
+
+            $tunnel->getConnectionNames()->each(function($connectionName) use (&$commands) {
+                $commands .= <<<EOF
+    ipsec down {$connectionName}
+EOF;
+            });
+
+            $tunnel->getConnectionNames()->each(function($connectionName) use (&$commands) {
+                $commands .= <<<EOF
+    ipsec up {$connectionName}
+EOF;
+            });
+
             $content .= <<<EOF
 # tunnel: {$tunnel->name}
 if ! {$tunnel->health_check_command}; then
-    ipsec down {$tunnel->name}
-    ipsec up {$tunnel->name}
+{$commands}
 fi
 EOF;
 

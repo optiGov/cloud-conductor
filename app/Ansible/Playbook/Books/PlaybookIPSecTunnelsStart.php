@@ -34,7 +34,7 @@ class PlaybookIPSecTunnelsStart extends Playbook
     public function prepare(Ansible $ansible, Process $process): static
     {
         // set variables
-        $ansible->variable("tunnels", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getTunnelName())->toArray());
+        $ansible->variable("tunnels", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getConnectionNames())->flatten()->toArray());
 
         // call parent method
         return parent::prepare($ansible, $process);
