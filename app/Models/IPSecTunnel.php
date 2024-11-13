@@ -18,6 +18,7 @@ use Illuminate\Support\Collection;
  * @property string $remote_ip
  * @property ?string $remote_id
  * @property string $remote_subnet
+ * @property boolean $separate_connections
  * @property string $ike_version
  * @property string $ike_encryption
  * @property string $ike_hash
@@ -71,14 +72,6 @@ class IPSecTunnel extends Model
     /**
      * @return string
      */
-    public function getTunnelName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return string
-     */
     public function getMark(): string
     {
         return "10{$this->id}";
@@ -105,7 +98,27 @@ EOF;
      */
     public function getIPSecConfigSection(): string
     {
-        return <<<EOF
+        $additionalConfigurations = "";
+        $remoteSubnet = $this->remote_subnet;
+
+        if($this->separate_connections) {
+            $networks = collect(explode(",", $this->remote_subnet));
+            $remoteSubnet = $networks->first();
+            $networks->shift();
+
+            $networks->each(function($network, $index) use (&$additionalConfigurations) {
+                $name = $this->getConnectionNames()->get($index + 1);
+                $additionalConfigurations .= <<<EOF
+
+conn $name
+        also={$this->name}
+        rightsubnet={$network}
+
+EOF;
+
+            });
+        }
+        $config = <<<EOF
 conn {$this->name}
         keyexchange=ike{$this->ike_version}
         ike={$this->ike_encryption}-{$this->ike_hash}-{$this->ike_dh_group}
@@ -115,14 +128,18 @@ conn {$this->name}
         leftsubnet={$this->local_subnet}
         right={$this->remote_ip}
         rightid={$this->remote_id}
-        rightsubnet={$this->remote_subnet}
+        rightsubnet={$remoteSubnet}
         ikelifetime={$this->ike_lifetime}s
         keylife={$this->key_lifetime}s
         authby=secret
         auto=add
         mark={$this->getMark()}
-
+$additionalConfigurations
 EOF;
+
+
+
+        return $config;
     }
 
     /**
@@ -172,5 +189,22 @@ EOF;
         $commands->add("iptables -t nat -A POSTROUTING-CLOUD-CONDUCTOR -o {$this->getVTIName()} -j RETURN");
 
         return $commands;
+    }
+
+    public function getConnectionNames(): Collection
+    {
+        $connectionNames = collect([$this->name]);
+
+        if($this->separate_connections) {
+            $networks = collect(explode(",", $this->remote_subnet));
+            $networks->shift();
+
+            $networks->each(function($_, $index) use (&$connectionNames) {
+                $index += 2;
+                $connectionNames->add("{$this->name}_{$index}");
+            });
+        }
+
+        return $connectionNames;
     }
 }
