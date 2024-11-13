@@ -200,12 +200,14 @@ EOF;
             $tunnel->getConnectionNames()->each(function($connectionName) use (&$commands) {
                 $commands .= <<<EOF
     ipsec down {$connectionName}
+
 EOF;
             });
 
             $tunnel->getConnectionNames()->each(function($connectionName) use (&$commands) {
                 $commands .= <<<EOF
     ipsec up {$connectionName}
+
 EOF;
             });
 
