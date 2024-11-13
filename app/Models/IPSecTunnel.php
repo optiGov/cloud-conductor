@@ -107,10 +107,10 @@ EOF;
             $networks->shift();
 
             $networks->each(function($network, $index) use (&$additionalConfigurations) {
-                $name = $this->getConnectionNames()->get($index + 1);
+                $connectionName = $this->getConnectionNames()->get($index + 1);
                 $additionalConfigurations .= <<<EOF
 
-conn $name
+conn $connectionName
         also={$this->name}
         rightsubnet={$network}
 
@@ -201,7 +201,7 @@ EOF;
 
             $networks->each(function($_, $index) use (&$connectionNames) {
                 $index += 2;
-                $connectionNames->add("{$this->name}_{$index}");
+                $connectionNames->add("{$this->name}{$index}");
             });
         }
 
