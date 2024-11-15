@@ -213,7 +213,7 @@ EOF;
 
             $content .= <<<EOF
 # tunnel: {$tunnel->name}
-if ! {$tunnel->health_check_command}; then
+if ! ({$tunnel->health_check_command}); then
 {$commands}
 fi
 EOF;
