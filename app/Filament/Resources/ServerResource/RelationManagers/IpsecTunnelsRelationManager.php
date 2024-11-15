@@ -15,6 +15,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class IpsecTunnelsRelationManager extends RelationManager
 {
@@ -48,6 +49,7 @@ class IpsecTunnelsRelationManager extends RelationManager
                                     ->default("v2")
                                     ->required(),
                                 Forms\Components\TextInput::make("psk")
+                                    ->default(fn() => Str::random(60))
                                     ->required()
                                     ->maxLength(255),
                             ])
