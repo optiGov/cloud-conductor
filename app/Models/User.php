@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property-read integer $id
  * @property string $name
  * @property string $email
- * @property Key[] $keys
+ * @property Collection<Key> $keys
  */
 class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {

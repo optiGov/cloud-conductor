@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 /**
  * @property-read integer $id
@@ -16,10 +18,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $reverse_proxy_acme_api_key
  * @property boolean $unattended_upgrades_enabled
  * @property string|null $unattended_upgrades_time
- * @property DockerImage[] $dockerImages
- * @property DockerNetwork[] $dockerNetworks
- * @property DockerContainer[] $dockerContainers
- * @property IPSecTunnel[] $ipsecTunnels
+ * @property JumpHost|null $jumpHost
+ * @property Collection<DockerImage> $dockerImages
+ * @property Collection<DockerNetwork> $dockerNetworks
+ * @property Collection<DockerContainer> $dockerContainers
+ * @property Collection<IPSecTunnel> $ipsecTunnels
+ * @property Collection<CronJob> $cronJobs
  */
 class Server extends Model
 {
@@ -73,5 +77,10 @@ class Server extends Model
     public function cronJobs(): HasMany
     {
         return $this->hasMany(CronJob::class);
+    }
+
+    public function jumpHost(): BelongsTo
+    {
+        return $this->belongsTo(JumpHost::class);
     }
 }

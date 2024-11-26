@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -19,7 +20,7 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string $username
  * @property-read bool $encrypted
- * @property-read Server[] $servers
+ * @property-read Collection<Server> $servers
  */
 class Key extends Model
 {
