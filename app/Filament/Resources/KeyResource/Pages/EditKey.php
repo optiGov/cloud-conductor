@@ -23,7 +23,7 @@ class EditKey extends EditRecord
             Actions\Action::make('Unencrypted key file')
                 ->icon('heroicon-o-exclamation-triangle')
                 ->action(function() {
-                    $this->record->encryptKey($this->mountedActionData["password"]);
+                    $this->record->encryptKey($this->mountedActionsData[0]["password"]);
                     $this->notify("success", "Key encrypted successfully.");
                 })
                 ->requiresConfirmation()
@@ -46,7 +46,7 @@ class EditKey extends EditRecord
                 ->icon('heroicon-o-lock-open')
                 ->action(function(){
                     try {
-                        $this->record->decryptKey($this->mountedActionData["password"]);
+                        $this->record->decryptKey($this->mountedActionsData[0]["password"]);
                         $this->notify("warning", "Key decrypted successfully.</br>Please set a new password immediately.");
                     } catch (\Exception $e) {
                         $this->notify("danger", "The password you entered is incorrect.");

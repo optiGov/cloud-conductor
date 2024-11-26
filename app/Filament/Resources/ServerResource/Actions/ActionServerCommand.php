@@ -33,14 +33,14 @@ class ActionServerCommand extends ActionServer
             ->action(function () use ($context) {
                 // get server and key
                 $server = Server::find($context->data["id"]);
-                $key = Key::find($context->mountedActionData["key"]);
+                $key = Key::find($context->mountedActionsData[0]["key"]);
 
                 // ping server
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookServerCommand())
                     ->on($server)
-                    ->with($key, $context->mountedActionData["password"])
-                    ->variable("command", $context->mountedActionData["command"])
+                    ->with($key, $context->mountedActionsData[0]["password"])
+                    ->variable("command", $context->mountedActionsData[0]["command"])
                     ->execute();
 
                 // notify user

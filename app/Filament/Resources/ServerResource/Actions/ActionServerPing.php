@@ -29,13 +29,13 @@ class ActionServerPing extends ActionServer
             ->action(function () use ($context) {
                 // get server and key
                 $server = Server::find($context->data["id"]);
-                $key = Key::find($context->mountedActionData["key"]);
+                $key = Key::find($context->mountedActionsData[0]["key"]);
 
                 // ping server
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookServerPing())
                     ->on($server)
-                    ->with($key, $context->mountedActionData["password"])
+                    ->with($key, $context->mountedActionsData[0]["password"])
                     ->execute();
 
                 // notify user

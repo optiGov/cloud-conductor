@@ -13,6 +13,7 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 
@@ -37,16 +38,16 @@ class ActionServerConfigure extends ActionServer
             ->action(function () use ($context) {
                 // get server and key
                 $server = Server::find($context->data["id"]);
-                $key = Key::find($context->mountedActionData["key"]);
+                $key = Key::find($context->mountedActionsData[0]["key"]);
 
                 // get configurations
-                $host = $context->mountedActionData["host"];
-                $reverse_proxy = $context->mountedActionData["reverse_proxy"];
+                $host = $context->mountedActionsData[0]["host"];
+                $reverse_proxy = $context->mountedActionsData[0]["reverse_proxy"];
 
                 // apply host configuration
                 if ($host) {
                     // run playbook
-                    $password = $context->mountedActionData["password"];
+                    $password = $context->mountedActionsData[0]["password"];
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookServerConfigure())
                         ->on($server)
@@ -57,16 +58,22 @@ class ActionServerConfigure extends ActionServer
 
                     // notify user
                     if ($result->noAnsibleErrors()) {
-                        $context->notify("success", "Host configuration applied successfully.");
+                        Notification::make()
+                            ->title("Host configuration applied successfully.")
+                            ->success()
+                            ->send();
                     } else {
-                        $context->notify("error", "Applying host configuration failed.");
+                        Notification::make()
+                            ->title("Applying host configuration failed.")
+                            ->danger()
+                            ->send();
                     }
                 }
 
                 // apply reverse-proxy configuration
                 if ($reverse_proxy) {
                     // run playbook
-                    $password = $context->mountedActionData["password"];
+                    $password = $context->mountedActionsData[0]["password"];
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookReverseProxyRun($server))
                         ->on($server)
@@ -75,9 +82,15 @@ class ActionServerConfigure extends ActionServer
 
                     // notify user
                     if ($result->noAnsibleErrors()) {
-                        $context->notify("success", "Reverse-Proxy configuration applied successfully.");
+                        Notification::make()
+                            ->title("Reverse-Proxy configuration applied successfully.")
+                            ->success()
+                            ->send();
                     } else {
-                        $context->notify("error", "Applying reverse-proxy configuration failed.");
+                        Notification::make()
+                            ->title("Applying reverse-proxy configuration failed.")
+                            ->danger()
+                            ->send();
                     }
                 }
             });
