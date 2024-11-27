@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
  * @property boolean $unattended_upgrades_enabled
  * @property string|null $unattended_upgrades_time
  * @property Collection<IPSecTunnel> $ipsecTunnels
+ * @property Collection<LocalIpAddress> $localIpAddresses
  * @property Collection<Server> $servers
  */
 class JumpHost extends Model implements Host
