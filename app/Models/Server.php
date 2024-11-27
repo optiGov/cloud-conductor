@@ -25,7 +25,7 @@ use Illuminate\Support\Collection;
  * @property Collection<IPSecTunnel> $ipsecTunnels
  * @property Collection<CronJob> $cronJobs
  */
-class Server extends Model
+class Server extends Model implements Host
 {
     use HasFactory;
 
