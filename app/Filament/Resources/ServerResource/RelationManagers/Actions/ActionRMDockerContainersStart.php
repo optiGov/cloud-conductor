@@ -3,22 +3,16 @@
 namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookDockerContainerCreate;
 use App\Ansible\Playbook\Books\PlaybookDockerContainerStart;
-use App\Ansible\Playbook\Books\PlaybookDockerImagePull;
-use App\Ansible\Playbook\Books\PlaybookIPSecTunnelsApply;
-use App\Ansible\Playbook\Books\PlaybookServerCommand;
+use App\Filament\Actions\ActionRM;
 use App\Models\DockerContainer;
 use App\Models\Key;
 use App\Models\Server;
-use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Filament\Tables\Table;
 use Illuminate\Support\Collection;
 use JsonException;
 
@@ -31,11 +25,12 @@ class ActionRMDockerContainersStart extends ActionRM
     public static function make(Table $table): Action
     {
         return Action::make("Start")
+            ->outlined()
             ->icon("heroicon-o-play")
             ->requiresConfirmation()
             ->label("Start")
             ->modalHeading("Start")
-            ->modalSubheading("Confirm to start all listed or the selected container(s) on the server.")
+            ->modalDescription("Confirm to start all listed or the selected container(s) on the server.")
             ->form([static::makeKeyPasswordGrid()])
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 // get server, containers and key
@@ -54,11 +49,12 @@ class ActionRMDockerContainersStart extends ActionRM
     public static function makeBulk(): BulkAction
     {
         return BulkAction::make("Start")
+            ->outlined()
             ->icon("heroicon-o-play")
             ->requiresConfirmation()
             ->label("Start")
             ->modalHeading("Start")
-            ->modalSubheading("Confirm to start all listed or the selected container(s) on the server.")
+            ->modalDescription("Confirm to start all listed or the selected container(s) on the server.")
             ->form([static::makeKeyPasswordGrid()])
             ->action(function (RelationManager $livewire, array $data) {
                 // get server, containers and key

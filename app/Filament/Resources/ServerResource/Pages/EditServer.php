@@ -2,18 +2,11 @@
 
 namespace App\Filament\Resources\ServerResource\Pages;
 
-use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookReverseProxyRun;
-use App\Ansible\Playbook\Books\PlaybookServerPing;
+use App\Filament\Actions\ActionHostCommand;
+use App\Filament\Actions\ActionHostConfigure;
+use App\Filament\Actions\ActionHostPing;
 use App\Filament\Resources\ServerResource;
-use App\Models\Key;
-use App\Models\Server;
-use App\Models\User;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Pages\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditServer extends EditRecord
@@ -23,10 +16,10 @@ class EditServer extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
-            ServerResource\Actions\ActionServerPing::make($this),
-            ServerResource\Actions\ActionServerCommand::make($this),
-            ServerResource\Actions\ActionServerConfigure::make($this),
+            DeleteAction::make(),
+            ActionHostPing::make($this->getMountedActionFormModel(), $this),
+            ActionHostCommand::make($this->getMountedActionFormModel(), $this),
+            ActionHostConfigure::make($this->getMountedActionFormModel(), $this),
         ];
     }
 }

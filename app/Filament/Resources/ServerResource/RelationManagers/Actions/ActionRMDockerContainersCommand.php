@@ -4,16 +4,16 @@ namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
 use App\Ansible\Playbook\Books\PlaybookDockerContainerCommand;
+use App\Filament\Actions\ActionRM;
 use App\Models\DockerContainer;
 use App\Models\Key;
 use App\Models\Server;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Table;
 use Ramsey\Collection\Collection;
 
 class ActionRMDockerContainersCommand extends ActionRM
@@ -25,11 +25,12 @@ class ActionRMDockerContainersCommand extends ActionRM
     public static function make(Table $table): Action
     {
         return Action::make("Command")
+            ->outlined()
             ->icon('heroicon-o-command-line')
             ->requiresConfirmation()
             ->label("Command")
             ->modalHeading("Command")
-            ->modalSubheading("Confirm to execute the command in all listed or the selected container(s) on the server.")
+            ->modalDescription("Confirm to execute the command in all listed or the selected container(s) on the server.")
             ->form([
                 static::makeKeyPasswordGrid(),
                 TextInput::make("command")
@@ -54,11 +55,12 @@ class ActionRMDockerContainersCommand extends ActionRM
     public static function makeBulk(): BulkAction
     {
         return BulkAction::make("Command")
+            ->outlined()
             ->icon('heroicon-o-command-line')
             ->requiresConfirmation()
             ->label("Command")
             ->modalHeading("Command")
-            ->modalSubheading("Confirm to execute the command in all listed or the selected container(s) on the server.")
+            ->modalDescription("Confirm to execute the command in all listed or the selected container(s) on the server.")
             ->form([
                 static::makeKeyPasswordGrid(),
                 TextInput::make("command")

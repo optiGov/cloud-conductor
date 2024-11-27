@@ -3,18 +3,13 @@
 namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookDockerImagePull;
 use App\Ansible\Playbook\Books\PlaybookDockerNetworkApply;
-use App\Ansible\Playbook\Books\PlaybookServerCommand;
+use App\Filament\Actions\ActionRM;
 use App\Models\Key;
-use App\Models\Server;
-use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Filament\Tables\Table;
 
 class ActionRMDockerNetworksApply extends ActionRM
 {
@@ -25,11 +20,12 @@ class ActionRMDockerNetworksApply extends ActionRM
     public static function make(Table $table): Action
     {
         return Action::make("Apply Docker Networks")
+            ->outlined()
             ->icon("heroicon-o-play")
             ->requiresConfirmation()
             ->label("Apply Docker Networks")
             ->modalHeading("Apply Docker Networks")
-            ->modalSubheading("Confirm to apply the selected docker networks to the server.")
+            ->modalDescription("Confirm to apply the selected docker networks to the server.")
             ->form([static::makeKeyPasswordGrid()])
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
