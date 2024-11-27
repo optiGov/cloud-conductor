@@ -21,13 +21,14 @@ class EditKey extends EditRecord
             }),
             // encrypt
             Actions\Action::make('Unencrypted key file')
+                ->outlined()
                 ->icon('heroicon-o-exclamation-triangle')
                 ->action(function() {
                     $this->record->encryptKey($this->mountedActionsData[0]["password"]);
                     $this->notify("success", "Key encrypted successfully.");
                 })
                 ->requiresConfirmation()
-                ->modalSubheading("Choose a new password for this key. Keep it safe. You won't be able to recover it.")
+                ->modalDescription("Choose a new password for this key. Keep it safe. You won't be able to recover it.")
                 ->form([
                     TextInput::make("password")
                         ->type("password")
@@ -43,6 +44,7 @@ class EditKey extends EditRecord
                 ->hidden(fn() => $this->record->encrypted),
             // decrypt
             Actions\Action::make('Decrypt key file')
+                ->outlined()
                 ->icon('heroicon-o-lock-open')
                 ->action(function(){
                     try {
@@ -54,7 +56,7 @@ class EditKey extends EditRecord
                 })
                 ->color("gray")
                 ->requiresConfirmation()
-                ->modalSubheading("Are you sure you want to decrypt this key? An unencrypted key file is a security risk.")
+                ->modalDescription("Are you sure you want to decrypt this key? An unencrypted key file is a security risk.")
                 ->form([
                     TextInput::make('password')
                         ->type("password")
