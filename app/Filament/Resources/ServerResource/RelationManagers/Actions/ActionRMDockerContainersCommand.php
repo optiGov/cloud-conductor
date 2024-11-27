@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
 use App\Ansible\Playbook\Books\PlaybookDockerContainerCommand;
-use App\Filament\Actions\ActionRM;
+use App\Filament\Actions\Host\ActionRM;
 use App\Models\DockerContainer;
 use App\Models\Key;
 use App\Models\Server;

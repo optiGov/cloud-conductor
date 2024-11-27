@@ -3,9 +3,8 @@
 namespace App\Filament\Resources\JumpHostResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookIPSecTunnelsApply;
 use App\Ansible\Playbook\Books\PlaybookLocalIPAddressesApply;
-use App\Filament\Actions\ActionRM;
+use App\Filament\Actions\Host\ActionRM;
 use App\Models\Key;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;

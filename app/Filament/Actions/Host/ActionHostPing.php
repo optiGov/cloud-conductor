@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Filament\Actions;
+namespace App\Filament\Actions\Host;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookServerCommand;
+use App\Ansible\Playbook\Books\PlaybookServerPing;
 use App\Models\Host;
 use App\Models\Key;
-use App\Models\Server;
 use Filament\Actions\Action;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
-class ActionHostCommand extends ActionHost
+class ActionHostPing extends ActionHost
 {
 
     /**
@@ -20,37 +18,33 @@ class ActionHostCommand extends ActionHost
      */
     public static function make(Host $host, EditRecord $context): Action
     {
-        return Action::make("Command")
+        return Action::make("Ping")
             ->outlined()
-            ->icon('heroicon-o-command-line')
+            ->icon("heroicon-o-fire")
             ->requiresConfirmation()
-            ->modalHeading("Run Command on Server")
-            ->modalDescription("Enter the command you want to run on the server and confirm.")
-            ->form([
-                static::makeKeyPasswordGrid(),
-                TextInput::make("command")->label("Command")->required(),
-            ])
+            ->modalHeading("Ping Server")
+            ->modalDescription("Confirm to ping the server and check if it is online.")
+            ->form([static::makeKeyPasswordGrid()])
             ->action(function () use ($host, $context) {
                 // get server and key
                 $key = Key::find($context->mountedActionsData[0]["key"]);
 
                 // ping server
                 $ansible = new Ansible();
-                $result = $ansible->play(new PlaybookServerCommand())
+                $result = $ansible->play(new PlaybookServerPing())
                     ->on($host)
                     ->with($key, $context->mountedActionsData[0]["password"])
-                    ->variable("command", $context->mountedActionsData[0]["command"])
                     ->execute();
 
                 // notify user
                 if ($result->noAnsibleErrors()) {
                     Notification::make()
-                        ->title($result->getLog()->first_success_message)
+                        ->title("Server responded successfully.")
                         ->success()
                         ->send();
                 } else {
                     Notification::make()
-                        ->title($result->getLog()->first_error_message)
+                        ->title("Ping failed.")
                         ->danger()
                         ->send();
                 }

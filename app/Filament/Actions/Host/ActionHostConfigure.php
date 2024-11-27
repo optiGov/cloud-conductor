@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Actions;
+namespace App\Filament\Actions\Host;
 
 use App\Ansible\Ansible;
 use App\Ansible\Playbook\Books\PlaybookReverseProxyRun;

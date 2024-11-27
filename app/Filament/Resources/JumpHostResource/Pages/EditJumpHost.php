@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\JumpHostResource\Pages;
 
-use App\Filament\Actions\ActionHostCommand;
-use App\Filament\Actions\ActionHostConfigure;
-use App\Filament\Actions\ActionHostPing;
+use App\Filament\Actions\Host\ActionHostCommand;
+use App\Filament\Actions\Host\ActionHostConfigure;
+use App\Filament\Actions\Host\ActionHostPing;
 use App\Filament\Resources\JumpHostResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;

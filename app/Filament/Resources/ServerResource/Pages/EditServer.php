@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\ServerResource\Pages;
 
-use App\Filament\Actions\ActionHostCommand;
-use App\Filament\Actions\ActionHostConfigure;
-use App\Filament\Actions\ActionHostPing;
+use App\Filament\Actions\Host\ActionHostCommand;
+use App\Filament\Actions\Host\ActionHostConfigure;
+use App\Filament\Actions\Host\ActionHostPing;
 use App\Filament\Resources\ServerResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
