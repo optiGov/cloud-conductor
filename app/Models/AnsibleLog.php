@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property-read integer $id
+ * @property string|null $host
  * @property string $command
  * @property array $result
  * @property-read string $result_json
@@ -17,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read ?string $first_success_message
  * @property string $created_at
  * @property string $updated_at
- * @property Server $server
  * @property Key $key
  * @property User $user
  */
@@ -41,14 +41,6 @@ class AnsibleLog extends Model
     protected $casts = [
         "result" => "array"
     ];
-
-    /**
-     * @return BelongsTo
-     */
-    public function server(): BelongsTo
-    {
-        return $this->belongsTo(Server::class);
-    }
 
     /**
      * @return BelongsTo
