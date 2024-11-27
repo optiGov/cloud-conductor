@@ -6,6 +6,7 @@ use App\Ansible\Playbook\Playbook;
 use App\Ansible\Process\Process;
 use App\Ansible\Process\ProcessResult;
 use App\Models\AnsibleLog;
+use App\Models\Host;
 use App\Models\Key;
 use App\Models\Server;
 use App\Models\User;
@@ -22,9 +23,9 @@ class Ansible
     protected Playbook $playbook;
 
     /**
-     * @var Server
+     * @var Host
      */
-    protected Server $server;
+    protected Host $host;
 
     /**
      * @var Key
@@ -68,12 +69,12 @@ class Ansible
     }
 
     /**
-     * @param Server $server
+     * @param Host $host
      * @return Ansible
      */
-    public function on(Server $server): static
+    public function on(Host $host): static
     {
-        $this->server = $server;
+        $this->host = $host;
         return $this;
     }
 
@@ -109,7 +110,7 @@ class Ansible
         $this->hostFilePath = storage_path("app/tmp/" . Str::uuid());
 
         // create file
-        File::put($this->hostFilePath, "[server]\n" . $this->server->host . " ansible_ssh_private_key_file=" . $this->key->getPath() . " ansible_user=" . $this->key->username);
+        File::put($this->hostFilePath, "[server]\n" . $this->host->host . " ansible_ssh_private_key_file=" . $this->key->getPath() . " ansible_user=" . $this->key->username);
 
         // return self
         return $this;
@@ -137,7 +138,7 @@ class Ansible
         $this->generateHostFile();
 
         // add to variables
-        $this->variable("host", $this->server->host);
+        $this->variable("host", $this->host->host);
 
         // create process
         $process = new Process();
@@ -182,7 +183,7 @@ class Ansible
 
         // log the result
         $log = $this->log(
-            $this->server,
+            $this->host,
             $this->key,
             auth()->user(),
             $process->getCommand(),
@@ -197,24 +198,24 @@ class Ansible
     }
 
     /**
-     * @param Server $server
+     * @param Host $host
      * @param Key $key
      * @param User|null $user
      * @param string $command
      * @param array $result
      * @return AnsibleLog
      */
-    protected function log(Server $server, Key $key, ?User $user, string $command, array $result): AnsibleLog
+    protected function log(Host $host, Key $key, ?User $user, string $command, array $result): AnsibleLog
     {
         // create new log
         $log = new AnsibleLog();
 
         // associate models
-        $log->server()->associate($server);
         $log->key()->associate($key);
         $log->user()->associate($user);
 
         // set values
+        $log->host = $host->name;
         $log->command = $command;
         $log->result = $result;
         $log->save();
