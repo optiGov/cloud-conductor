@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerNetworksApply;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerNetworksApply;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -58,7 +58,7 @@ class DockerNetworksRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                ActionRMDockerNetworksApply::make($table),
+                KeyPasswordActionDockerNetworksApply::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

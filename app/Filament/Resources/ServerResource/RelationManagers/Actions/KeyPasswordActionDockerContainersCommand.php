@@ -4,7 +4,7 @@ namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
 use App\Ansible\Playbook\Books\PlaybookDockerContainerCommand;
-use App\Filament\Actions\Host\ActionRM;
+use App\Filament\Actions\Host\KeyPasswordAction;
 use App\Models\DockerContainer;
 use App\Models\Key;
 use App\Models\Server;
@@ -16,7 +16,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Table;
 use Ramsey\Collection\Collection;
 
-class ActionRMDockerContainersCommand extends ActionRM
+class KeyPasswordActionDockerContainersCommand extends KeyPasswordAction
 {
 
     /**

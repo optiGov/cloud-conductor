@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\JumpHostResource\RelationManagers;
 
-use App\Filament\Resources\JumpHostResource\RelationManagers\Actions\ActionRMLocalIPAddressesApply;
+use App\Filament\Resources\JumpHostResource\RelationManagers\Actions\KeyPasswordActionLocalIPAddressesApply;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -42,7 +42,7 @@ class LocalIpAddressesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                ActionRMLocalIPAddressesApply::make($table),
+                KeyPasswordActionLocalIPAddressesApply::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

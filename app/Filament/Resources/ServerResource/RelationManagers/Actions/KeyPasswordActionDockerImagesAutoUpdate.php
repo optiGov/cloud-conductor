@@ -4,14 +4,14 @@ namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
 use App\Ansible\Playbook\Books\PlaybookDockerImageAutoUpdate;
-use App\Filament\Actions\Host\ActionRM;
+use App\Filament\Actions\Host\KeyPasswordAction;
 use App\Models\Key;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 
-class ActionRMDockerImagesAutoUpdate extends ActionRM
+class KeyPasswordActionDockerImagesAutoUpdate extends KeyPasswordAction
 {
 
     /**

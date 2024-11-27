@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMCronJobsApply;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionCronJobsApply;
 use App\Models\CronJob;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -78,7 +78,7 @@ class CronJobsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                ActionRMCronJobsApply::make($table),
+                KeyPasswordActionCronJobsApply::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

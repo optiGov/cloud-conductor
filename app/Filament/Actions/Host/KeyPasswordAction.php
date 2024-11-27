@@ -12,7 +12,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Table;
 
-abstract class ActionRM
+abstract class KeyPasswordAction
 {
     /**
      * @param Table $table

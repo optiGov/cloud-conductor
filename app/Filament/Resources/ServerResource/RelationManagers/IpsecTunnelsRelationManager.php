@@ -2,24 +2,20 @@
 
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
+use App\Filament\Actions\IPSecTunnel\KeyPasswordActionIPSecTunnelsApply;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormEncryption;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormGeneral;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormLifetime;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormNetworking;
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMIPSecTunnelsApply;
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMIPSecTunnelsStart;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionRMIPSecTunnelsStart;
 use App\Models\DockerNetwork;
 use App\Models\Server;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Filament\Tables\Table;
 
 class IpsecTunnelsRelationManager extends RelationManager
 {
@@ -86,13 +82,13 @@ class IpsecTunnelsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                ActionRMIPSecTunnelsApply::make($table),
-                ActionRMIPSecTunnelsStart::make($table),
+                KeyPasswordActionIPSecTunnelsApply::make($table),
+                KeyPasswordActionRMIPSecTunnelsStart::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                ActionRMIPSecTunnelsStart::make($table)
+                KeyPasswordActionRMIPSecTunnelsStart::make($table)
             ])
             ->bulkActions([]);
     }

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerImagesAutoUpdate;
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerImagesPull;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerImagesAutoUpdate;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerImagesPull;
 use Carbon\Carbon;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -90,8 +90,8 @@ class DockerImagesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                ActionRMDockerImagesAutoUpdate::make($table),
-                ActionRMDockerImagesPull::make($table),
+                KeyPasswordActionDockerImagesAutoUpdate::make($table),
+                KeyPasswordActionDockerImagesPull::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

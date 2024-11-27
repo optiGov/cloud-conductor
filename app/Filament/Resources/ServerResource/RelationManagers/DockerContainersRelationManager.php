@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersCommand;
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersCreate;
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersStart;
-use App\Filament\Resources\ServerResource\RelationManagers\Actions\ActionRMDockerContainersStop;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerContainersCommand;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerContainersCreate;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerContainersStart;
+use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionDockerContainersStop;
 use App\Models\DockerContainer;
 use App\Models\DockerNetwork;
 use App\Models\Key;
@@ -238,22 +238,22 @@ class DockerContainersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                ActionRMDockerContainersCreate::make($table),
-                ActionRMDockerContainersStart::make($table),
-                ActionRMDockerContainersStop::make($table),
-                ActionRMDockerContainersCommand::make($table),
+                KeyPasswordActionDockerContainersCreate::make($table),
+                KeyPasswordActionDockerContainersStart::make($table),
+                KeyPasswordActionDockerContainersStop::make($table),
+                KeyPasswordActionDockerContainersCommand::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ActionRMDockerContainersCreate::make($table),
-                ActionRMDockerContainersStart::make($table),
-                ActionRMDockerContainersStop::make($table),
-                ActionRMDockerContainersCommand::make($table),
+                KeyPasswordActionDockerContainersCreate::make($table),
+                KeyPasswordActionDockerContainersStart::make($table),
+                KeyPasswordActionDockerContainersStop::make($table),
+                KeyPasswordActionDockerContainersCommand::make($table),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                ActionRMDockerContainersStart::makeBulk(),
-                ActionRMDockerContainersCommand::makeBulk(),
+                KeyPasswordActionDockerContainersStart::makeBulk(),
+                KeyPasswordActionDockerContainersCommand::makeBulk(),
             ]);
     }
 }

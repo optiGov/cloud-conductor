@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
+namespace App\Filament\Resources\JumpHostResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookIPSecTunnelsStart;
-use App\Filament\Actions\Host\ActionRM;
+use App\Ansible\Playbook\Books\PlaybookLocalIPAddressesApply;
+use App\Filament\Actions\Host\KeyPasswordAction;
 use App\Models\Key;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
-use Illuminate\Support\Collection;
 
-class ActionRMIPSecTunnelsStart extends ActionRM
+class KeyPasswordActionLocalIPAddressesApply extends KeyPasswordAction
 {
 
     /**
@@ -20,33 +19,34 @@ class ActionRMIPSecTunnelsStart extends ActionRM
      */
     public static function make(Table $table): Action
     {
-        return Action::make("Start IPSec Tunnels")
+        return Action::make("Apply Local IP Addresses")
             ->outlined()
-            ->icon("heroicon-o-play")
+            ->outlined()
+            ->icon("heroicon-o-sparkles")
             ->requiresConfirmation()
-            ->label("Start IPSec Tunnels")
-            ->modalHeading("Start IPSec Tunnels")
-            ->modalDescription("Confirm to start the configured IPSec Tunnels.")
+            ->label("Apply Local IP Addresses")
+            ->modalHeading("Apply Local IP Addresses")
+            ->modalDescription("Confirm to apply the configured Local IP Addresses.")
             ->form([static::makeKeyPasswordGrid()])
             ->action(function (RelationManager $livewire, array $data) use ($table) {
-                $server = $livewire->ownerRecord;
-                $ipsecTunnels = $livewire->getMountedTableActionRecord() ? new Collection([$livewire->getMountedTableActionRecord()]) : $server->ipsecTunnels;
+                $jumpHost = $livewire->ownerRecord;
+                $ipAddresses = $jumpHost->localIpAddresses;
                 $key = Key::findOrFail($data["key"]);
 
                 $ansible = new Ansible();
-                $result = $ansible->play(new PlaybookIPSecTunnelsStart($ipsecTunnels))
-                    ->on($server)
+                $result = $ansible->play(new PlaybookLocalIPAddressesApply($ipAddresses))
+                    ->on($jumpHost)
                     ->with($key, $data["password"])
                     ->execute();
 
                 if ($result->noAnsibleErrors()) {
                     Notification::make()
-                        ->title("Started IPSec Tunnels.")
+                        ->title("Applied Local IP Addresses.")
                         ->success()
                         ->send();
                 } else {
                     Notification::make()
-                        ->title("Failed to start IPSec Tunnels.")
+                        ->title("Failed to apply Local IP Addresses.")
                         ->danger()
                         ->send();
                 }

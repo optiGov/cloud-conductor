@@ -3,15 +3,15 @@
 namespace App\Filament\Resources\ServerResource\RelationManagers\Actions;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookDockerContainerCreate;
-use App\Filament\Actions\Host\ActionRM;
+use App\Ansible\Playbook\Books\PlaybookDockerNetworkApply;
+use App\Filament\Actions\Host\KeyPasswordAction;
 use App\Models\Key;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 
-class ActionRMDockerContainersCreate extends ActionRM
+class KeyPasswordActionDockerNetworksApply extends KeyPasswordAction
 {
 
     /**
@@ -19,36 +19,35 @@ class ActionRMDockerContainersCreate extends ActionRM
      */
     public static function make(Table $table): Action
     {
-        return Action::make("Create")
+        return Action::make("Apply Docker Networks")
             ->outlined()
-            ->icon("heroicon-o-sparkles")
+            ->icon("heroicon-o-play")
             ->requiresConfirmation()
-            ->label("Create")
-            ->modalHeading("Create")
-            ->modalDescription("Confirm to create all listed or the selected container(s) on the server.")
+            ->label("Apply Docker Networks")
+            ->modalHeading("Apply Docker Networks")
+            ->modalDescription("Confirm to apply the selected docker networks to the server.")
             ->form([static::makeKeyPasswordGrid()])
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
-                $containers = $livewire->getMountedTableActionRecord() ? [$livewire->getMountedTableActionRecord()] : $server->dockerContainers;
+                $networks = $server->dockerNetworks;
                 $key = Key::findOrFail($data["key"]);
 
-                foreach ($containers as $container) {
+                foreach ($networks as $network) {
                     $password = $data["password"];
                     $ansible = new Ansible();
-                    $result = $ansible->play(new PlaybookDockerContainerCreate($container))
+                    $result = $ansible->play(new PlaybookDockerNetworkApply($network))
                         ->on($server)
                         ->with($key, $password)
                         ->execute();
 
-
                     if ($result->noAnsibleErrors()) {
                         Notification::make()
-                            ->title("Created container [{$container->name}].")
+                            ->title("Created network [{$network->name}].")
                             ->success()
                             ->send();
                     } else {
                         Notification::make()
-                            ->title("[{$container->name}]: " . $result->getLog()->first_error_message)
+                            ->title("Failed to create network [{$network->name}].")
                             ->danger()
                             ->send();
                     }
