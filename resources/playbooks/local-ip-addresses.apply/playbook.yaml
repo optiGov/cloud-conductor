@@ -1,0 +1,22 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Copy `cloud-conductor.yaml` from {{ file_netplan }} to `/etc/netplan/01-cloud-conductor.yaml`"
+      become: true
+      template:
+        src: "{{ file_netplan }}"
+        dest: "/etc/netplan/01-cloud-conductor.yaml"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Generate and apply new netplan configuration"
+      become: true
+      shell: "netplan generate && netplan apply"
+      register: netplan_restart
+
+    - name: "Restart systemd-networkd"
+      become: true
+      shell: "systemctl restart systemd-networkd"
+      register: systemd_networkd_restart
