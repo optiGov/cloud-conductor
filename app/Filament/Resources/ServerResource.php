@@ -2,25 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ServerResource\Forms\ServerFormGeneral;
-use App\Filament\Resources\ServerResource\Forms\ServerFormReverseProxy;
-use App\Filament\Resources\ServerResource\Forms\ServerFormSchedules;
+use App\Filament\Forms\ServerFormGeneral;
+use App\Filament\Forms\ServerFormJumpHost;
+use App\Filament\Forms\ServerFormReverseProxy;
+use App\Filament\Forms\ServerFormSchedules;
 use App\Filament\Resources\ServerResource\Pages;
 use App\Filament\Resources\ServerResource\RelationManagers;
-use App\Models\Key;
 use App\Models\Server;
-use Filament\Forms;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class ServerResource extends Resource
 {
@@ -48,6 +42,9 @@ class ServerResource extends Resource
                         Tab::make("Reverse-Proxy")
                             ->icon('heroicon-o-globe-americas')
                             ->schema([ServerFormReverseProxy::make()]),
+                        Tab::make("Jump-Host")
+                            ->icon('heroicon-o-forward')
+                            ->schema([ServerFormJumpHost::make()]),
                     ])
             ]);
     }
@@ -69,6 +66,10 @@ class ServerResource extends Resource
                         "zero_ssl" => "ZeroSSL",
                         default => $state,
                     })
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('jumpHost.name')
+                    ->default('-')
                     ->searchable()
                     ->sortable(),
             ])
