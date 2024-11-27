@@ -10,7 +10,7 @@
 
     - name: "Copy `./docker-compose.yaml` in `reverse-proxy` folder"
       template:
-        src: "./docker-compose.yaml"
+        src: "../../playbook-files/reverse-proxy/docker-compose.yaml"
         dest: "/usr/local/share/cloud-conductor/reverse-proxy/docker-compose.yaml"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
@@ -18,7 +18,7 @@
 
     - name: "Copy `./additional.conf` in `reverse-proxy` folder"
       template:
-        src: "./additional.conf"
+        src: "../../playbook-files/reverse-proxy/additional.conf"
         dest: "/usr/local/share/cloud-conductor/reverse-proxy/additional.conf"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"

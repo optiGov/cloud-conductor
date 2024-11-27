@@ -1,0 +1,9 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  tasks:
+
+    - name: "Ping {{ host }}"
+      ping:
+      register: ping_result
+    - debug:
+        var: ping_result

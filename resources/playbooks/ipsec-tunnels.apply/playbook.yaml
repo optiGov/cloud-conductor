@@ -11,7 +11,7 @@
     - name: "Copy `charon.conf` to `/etc/strongswan.d/charon.conf`"
       become: true
       template:
-        src: "charon.conf"
+        src: "../../playbook-files/ipsec/charon.conf"
         dest: "/etc/strongswan.d/charon.conf"
         owner: root
         group: root
@@ -74,7 +74,7 @@
         group: root
         mode: 0644
 
-    - name: "Create cronjob `ipsec-tunnel-health-check` every 30 minutes"
+    - name: "Create cronjob `ipsec-tunnel-health-check` every 5 minutes"
       become: true
       ansible.builtin.cron:
         name: "ipsec-tunnel-health-check"
@@ -90,6 +90,7 @@
         owner: root
         group: root
         mode: 0644
+      when: iptables_command is defined
 
     - name: "Create cronjob `iptables-persistent` at reboot"
       become: true
@@ -98,3 +99,4 @@
         special_time: reboot
         job: "sh /usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
         state: present
+      when: iptables_command is defined

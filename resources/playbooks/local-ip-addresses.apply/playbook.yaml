@@ -2,11 +2,11 @@
   gather_facts: no
   tasks:
 
-    - name: "Copy `cloud-conductor.yaml` from {{ file_netplan }} to `/etc/netplan/01-cloud-conductor.yaml`"
+    - name: "Copy `cloud-conductor.yaml` from {{ file_netplan }} to `/etc/netplan/02-cloud-conductor.yaml`"
       become: true
       template:
         src: "{{ file_netplan }}"
-        dest: "/etc/netplan/01-cloud-conductor.yaml"
+        dest: "/etc/netplan/02-cloud-conductor.yaml"
         owner: root
         group: root
         mode: 0644
