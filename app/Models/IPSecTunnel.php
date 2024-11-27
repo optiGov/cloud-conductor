@@ -31,6 +31,8 @@ use Illuminate\Support\Collection;
  * @property array $routing
  * @property boolean $health_check_enabled
  * @property ?string $health_check_command
+ * @property ?Server $server
+ * @property ?JumpHost $jumpHost
  */
 class IPSecTunnel extends Model
 {
@@ -59,6 +61,14 @@ class IPSecTunnel extends Model
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function jumpHost(): BelongsTo
+    {
+        return $this->belongsTo(JumpHost::class);
     }
 
     /**
