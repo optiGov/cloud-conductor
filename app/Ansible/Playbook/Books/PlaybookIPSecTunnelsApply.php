@@ -28,10 +28,15 @@ class PlaybookIPSecTunnelsApply extends Playbook
      * @param Collection<IPSecTunnel> $tunnels
      */
     public function __construct(
-        protected Collection $tunnels
+        protected Collection $tunnels,
     )
     {
         parent::__construct();
+    }
+
+    private function isOnServer(): bool
+    {
+        return $this->tunnels->first()->server_id !== null;
     }
 
     /**
@@ -41,29 +46,33 @@ class PlaybookIPSecTunnelsApply extends Playbook
     {
         // set variables
         $ansible->variable("interfaces", $this->tunnels->map(fn(IPSecTunnel $tunnel) => $tunnel->getVTIName())->toArray());
-        $ansible->variable("iptables_command", $this->getIpTablesCommands());
+
+        // only set iptables_command if we are on the server, to enable routing into the docker networks
+        if($this->isOnServer()){
+            $ansible->variable("iptables_command", $this->getIpTablesCommands());
+        }
 
         // build ipsec.conf
         $this->buildIPSecConf($ansible, $process);
+        $ansible->variable("file_ipsec_conf", $this->ipsecConfFilePath);
 
         // build ipsec.secrets
         $this->buildIPSecSecrets($ansible, $process);
+        $ansible->variable("file_ipsec_secrets", $this->ipsecSecretsFilePath);
 
         // build netplan
         $this->buildNetplan($ansible, $process);
+        $ansible->variable("file_netplan", $this->netplanFilePath);
 
         // build health check script
         $this->buildHealthCheckScript($ansible, $process);
-
-        // build health check script
-        $this->buildIptablesPersistentScript($ansible, $process);
-
-        // set variables
-        $ansible->variable("file_ipsec_conf", $this->ipsecConfFilePath);
-        $ansible->variable("file_ipsec_secrets", $this->ipsecSecretsFilePath);
-        $ansible->variable("file_netplan", $this->netplanFilePath);
         $ansible->variable("file_health_check", $this->healthCheckScriptFilePath);
-        $ansible->variable("file_iptables_persistent", $this->iptablesPersistentScriptFilePath);
+
+        // build health check script if we are on the server
+        if($this->isOnServer()){
+            $this->buildIptablesPersistentScript($ansible, $process);
+            $ansible->variable("file_iptables_persistent", $this->iptablesPersistentScriptFilePath);
+        }
 
         // call parent method
         return parent::prepare($ansible, $process);
@@ -197,14 +206,14 @@ EOF;
 
             $commands = '';
 
-            $tunnel->getConnectionNames()->each(function($connectionName) use (&$commands) {
+            $tunnel->getConnectionNames()->each(function ($connectionName) use (&$commands) {
                 $commands .= <<<EOF
     ipsec down {$connectionName}
 
 EOF;
             });
 
-            $tunnel->getConnectionNames()->each(function($connectionName) use (&$commands) {
+            $tunnel->getConnectionNames()->each(function ($connectionName) use (&$commands) {
                 $commands .= <<<EOF
     ipsec up {$connectionName}
 
@@ -246,8 +255,7 @@ sleep 30
 
 # run iptables commands
 
-EOF;
-;
+EOF;;
 
         // add commands
         $commands = $this->getIpTablesCommands(false);
@@ -269,7 +277,10 @@ EOF;
         File::delete($this->ipsecSecretsFilePath);
         File::delete($this->netplanFilePath);
         File::delete($this->healthCheckScriptFilePath);
-        File::delete($this->iptablesPersistentScriptFilePath);
+
+        if($this->isOnServer()){
+            File::delete($this->iptablesPersistentScriptFilePath);
+        }
     }
 
     /**
