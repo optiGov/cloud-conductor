@@ -34,10 +34,9 @@ class AnsibleLogResource extends Resource
                     ->columns(3)
                     ->schema([
                         // server
-                        Forms\Components\Select::make("server_id")
-                            ->relationship("server", "name")
-                            ->required()
-                            ->placeholder("Select a server"),
+                        Forms\Components\TextInput::make('host')
+                            ->disabled()
+                            ->required(),
                         // user
                         Forms\Components\Select::make("user_id")
                             ->relationship("user", "name")
@@ -60,6 +59,7 @@ class AnsibleLogResource extends Resource
                             ->formatStateUsing(function (array $state) {
                                 return json_encode($state, JSON_PRETTY_PRINT);
                             })
+                            ->rows(15)
                             ->disabled()
                             ->required(),
                     ])
@@ -70,7 +70,7 @@ class AnsibleLogResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('server.name')
+                Tables\Columns\TextColumn::make('host')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('key.name')
