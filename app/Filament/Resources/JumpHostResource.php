@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Forms\ServerFormGeneral;
-use App\Filament\Forms\ServerFormSchedules;
+use App\Filament\Forms\Server\ServerFormGeneral;
+use App\Filament\Forms\Server\ServerFormSchedules;
 use App\Filament\Resources\JumpHostResource\Pages;
 use App\Filament\Resources\JumpHostResource\RelationManagers;
 use App\Models\JumpHost;

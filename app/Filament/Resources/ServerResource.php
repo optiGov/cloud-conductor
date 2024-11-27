@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Forms\ServerFormGeneral;
-use App\Filament\Forms\ServerFormJumpHost;
-use App\Filament\Forms\ServerFormReverseProxy;
-use App\Filament\Forms\ServerFormSchedules;
+use App\Filament\Forms\Server\ServerFormGeneral;
+use App\Filament\Forms\Server\ServerFormJumpHost;
+use App\Filament\Forms\Server\ServerFormReverseProxy;
+use App\Filament\Forms\Server\ServerFormSchedules;
 use App\Filament\Resources\ServerResource\Pages;
 use App\Filament\Resources\ServerResource\RelationManagers;
 use App\Models\Server;
