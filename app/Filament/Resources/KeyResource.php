@@ -23,11 +23,9 @@ class KeyResource extends Resource
 {
     protected static ?string $model = Key::class;
 
-    protected static ?string $navigationGroup = 'Conductor';
+    protected static ?string $navigationGroup = 'Administration';
 
     protected static ?string $navigationIcon = 'heroicon-o-key';
-
-    protected static ?int $navigationSort = -4;
 
 
     public static function form(Form $form): Form
@@ -85,11 +83,12 @@ class KeyResource extends Resource
                                     Login to your server as <strong>' . $key->username . '</strong> and run the following command to add the key to the authorized keys:
                                     </p>
 
-                                    <code class="text-sm sm:text-base inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 pl-6 mb-2">
+                                    <code class="text-sm sm:text-base inline-flex text-left items-center space-x-4 bg-black black rounded-lg p-4 pl-6 mb-2">
                                         <span class="flex gap-4">
                                             <span class="shrink-0 text-gray-500">$</span>
                                             <span class="flex-1">
                                                 <span>echo "' . File::get($key->getPublicKeyPath()) . '" >> ~/.ssh/authorized_keys </span>
+                                            </span>
                                         </span>
                                     </code>
 
