@@ -21,7 +21,7 @@ class KeyPasswordActionIPSecTunnelsApply extends KeyPasswordAction
     {
         return Action::make("Apply IPSec Tunnels")
             ->outlined()
-            ->icon("heroicon-o-document-text")
+            ->icon("heroicon-o-sparkles")
             ->requiresConfirmation()
             ->label("Apply IPSec Tunnels")
             ->modalHeading("Apply IPSec Tunnels")

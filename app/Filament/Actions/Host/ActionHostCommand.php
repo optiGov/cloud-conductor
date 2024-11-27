@@ -3,7 +3,7 @@
 namespace App\Filament\Actions\Host;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookServerCommand;
+use App\Ansible\Playbook\Books\PlaybookHostCommand;
 use App\Models\Host;
 use App\Models\Key;
 use Filament\Actions\Action;
@@ -35,7 +35,7 @@ class ActionHostCommand extends ActionHost
 
                 // ping server
                 $ansible = new Ansible();
-                $result = $ansible->play(new PlaybookServerCommand())
+                $result = $ansible->play(new PlaybookHostCommand())
                     ->on($host)
                     ->with($key, $context->mountedActionsData[0]["password"])
                     ->variable("command", $context->mountedActionsData[0]["command"])

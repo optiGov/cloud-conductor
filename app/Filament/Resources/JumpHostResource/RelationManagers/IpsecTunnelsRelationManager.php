@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JumpHostResource\RelationManagers;
 
+use App\Filament\Actions\IPSecTunnel\KeyPasswordActionIPSecTunnelsApply;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormEncryption;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormGeneral;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormLifetime;
@@ -72,6 +73,7 @@ class IpsecTunnelsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                KeyPasswordActionIPSecTunnelsApply::make($table),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

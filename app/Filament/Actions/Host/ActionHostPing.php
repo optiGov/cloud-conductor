@@ -3,7 +3,7 @@
 namespace App\Filament\Actions\Host;
 
 use App\Ansible\Ansible;
-use App\Ansible\Playbook\Books\PlaybookServerPing;
+use App\Ansible\Playbook\Books\PlaybookHostPing;
 use App\Models\Host;
 use App\Models\Key;
 use Filament\Actions\Action;
@@ -20,7 +20,7 @@ class ActionHostPing extends ActionHost
     {
         return Action::make("Ping")
             ->outlined()
-            ->icon("heroicon-o-fire")
+            ->icon("heroicon-o-bell-alert")
             ->requiresConfirmation()
             ->modalHeading("Ping Server")
             ->modalDescription("Confirm to ping the server and check if it is online.")
@@ -31,7 +31,7 @@ class ActionHostPing extends ActionHost
 
                 // ping server
                 $ansible = new Ansible();
-                $result = $ansible->play(new PlaybookServerPing())
+                $result = $ansible->play(new PlaybookHostPing())
                     ->on($host)
                     ->with($key, $context->mountedActionsData[0]["password"])
                     ->execute();
