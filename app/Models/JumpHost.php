@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
  * @property Collection<IPSecTunnel> $ipsecTunnels
  * @property Collection<Server> $servers
  */
-class JumpHost extends Model
+class JumpHost extends Model implements Host
 {
     use HasFactory;
 
@@ -37,6 +37,14 @@ class JumpHost extends Model
     public function ipsecTunnels(): HasMany
     {
         return $this->hasMany(IPSecTunnel::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function localIpAddresses(): HasMany
+    {
+        return $this->hasMany(LocalIpAddress::class);
     }
 
     /**
