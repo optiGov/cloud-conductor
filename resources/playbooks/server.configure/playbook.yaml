@@ -3,6 +3,22 @@
   become: yes
   tasks:
 
+    - name: "Update and Upgrade apt packages as sudo on {{ host }}"
+      apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 3600
+
+    - name: "Install strongswan-starter package via apt as sudo on {{ host }}"
+      apt:
+        name: strongswan-starter
+        state: present
+
+    - name: "Install strongswan-pki package via apt as sudo on {{ host }}"
+      apt:
+        name: strongswan-pki
+        state: present
+
     - name: Create directories for keys
       file:
         path: "{{ item }}"
@@ -28,22 +44,6 @@
       loop:
         - /etc/ipsec.d/keys/server.key
         - /etc/ipsec.d/keys/server.pub
-
-    - name: "Update and Upgrade apt packages as sudo on {{ host }}"
-      apt:
-        update_cache: yes
-        upgrade: yes
-        cache_valid_time: 3600
-
-    - name: "Install strongswan-starter package via apt as sudo on {{ host }}"
-      apt:
-        name: strongswan-starter
-        state: present
-
-    - name: "Install strongswan-pki package via apt as sudo on {{ host }}"
-      apt:
-        name: strongswan-pki
-        state: present
 
     - name: "Ensure required packages for Docker are installed"
       apt:
