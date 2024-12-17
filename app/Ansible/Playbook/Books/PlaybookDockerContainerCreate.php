@@ -39,7 +39,7 @@ class PlaybookDockerContainerCreate extends Playbook
     public function prepare(Ansible $ansible, Process $process): static
     {
         // get path
-        $this->dockerComposeFilePath = $this->newTemporyFile();
+        $this->dockerComposeFilePath = $this->newTemporaryFile();
 
         // create docker-compose file
         File::put($this->dockerComposeFilePath, $this->container->getDockerComposeContent());

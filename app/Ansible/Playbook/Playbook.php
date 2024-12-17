@@ -4,6 +4,7 @@ namespace App\Ansible\Playbook;
 
 use App\Ansible\Ansible;
 use App\Ansible\Process\Process;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class Playbook
@@ -45,8 +46,15 @@ class Playbook
         return resource_path("playbooks/{$this->directory}/playbook.yaml");
     }
 
-    protected function newTemporyFile(): string
+    protected function newTemporaryFile(): string
     {
         return storage_path("app/tmp/" . Str::uuid());
+    }
+
+    protected function newTemporaryFolder(): string
+    {
+        $path = storage_path("app/tmp/" . Str::uuid());
+        File::makeDirectory($path);
+        return $path;
     }
 }

@@ -31,12 +31,11 @@ class KeyPasswordActionLocalIPAddressesApply extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $jumpHost = $livewire->ownerRecord;
                 $ipAddresses = $jumpHost->localIpAddresses;
-                $key = Key::findOrFail($data["key"]);
 
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookLocalIPAddressesApply($ipAddresses))
                     ->on($jumpHost)
-                    ->with($key, $data["password"])
+                    ->passwords($data)
                     ->execute();
 
                 if ($result->noAnsibleErrors()) {

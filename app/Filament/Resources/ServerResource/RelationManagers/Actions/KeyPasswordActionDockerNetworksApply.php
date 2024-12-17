@@ -30,14 +30,12 @@ class KeyPasswordActionDockerNetworksApply extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $networks = $server->dockerNetworks;
-                $key = Key::findOrFail($data["key"]);
 
                 foreach ($networks as $network) {
-                    $password = $data["password"];
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookDockerNetworkApply($network))
                         ->on($server)
-                        ->with($key, $password)
+                        ->passwords($data)
                         ->execute();
 
                     if ($result->noAnsibleErrors()) {

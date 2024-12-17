@@ -89,8 +89,8 @@
         regexp: "^(.*)PasswordAuthentication(.*)$"
         replace: "PasswordAuthentication no"
 
-    - name: "Restart sshd"
+    - name: "Restart ssh"
       become: yes
       service:
-        name: sshd
+        name: ssh
         state: restarted

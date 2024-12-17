@@ -19,13 +19,14 @@ use Illuminate\Support\Collection;
  * @property boolean $unattended_upgrades_enabled
  * @property string|null $unattended_upgrades_time
  * @property JumpHost|null $jumpHost
+ * @property Key|null $key
  * @property Collection<DockerImage> $dockerImages
  * @property Collection<DockerNetwork> $dockerNetworks
  * @property Collection<DockerContainer> $dockerContainers
  * @property Collection<IPSecTunnel> $ipsecTunnels
  * @property Collection<CronJob> $cronJobs
  */
-class Server extends Model implements Host
+class Server extends Host
 {
     use HasFactory;
 
@@ -82,5 +83,10 @@ class Server extends Model implements Host
     public function jumpHost(): BelongsTo
     {
         return $this->belongsTo(JumpHost::class);
+    }
+
+    public function key(): BelongsTo
+    {
+        return $this->belongsTo(Key::class);
     }
 }

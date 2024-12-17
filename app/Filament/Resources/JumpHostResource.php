@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Server\ServerFormAuthentication;
 use App\Filament\Forms\Server\ServerFormGeneral;
+use App\Filament\Forms\Server\ServerFormJumpHost;
 use App\Filament\Forms\Server\ServerFormSchedules;
 use App\Filament\Resources\JumpHostResource\Pages;
 use App\Filament\Resources\JumpHostResource\RelationManagers;
@@ -34,9 +36,15 @@ class JumpHostResource extends Resource
                         Tab::make("General")
                             ->icon("heroicon-o-server")
                             ->schema([ServerFormGeneral::make()]),
+                        Tab::make("Authentication")
+                            ->icon("heroicon-o-key")
+                            ->schema([ServerFormAuthentication::make()]),
                         Tab::make("Schedules")
                             ->icon("heroicon-o-clock")
                             ->schema([ServerFormSchedules::make()]),
+                        Tab::make("Jump-Host")
+                            ->icon('heroicon-o-forward')
+                            ->schema([ServerFormJumpHost::make()]),
                     ])
             ]);
     }
@@ -48,6 +56,8 @@ class JumpHostResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('host')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('key.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

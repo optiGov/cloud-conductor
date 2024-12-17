@@ -30,14 +30,13 @@ class KeyPasswordActionCronJobsApply extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $cronjobs = $server->cronJobs()->withTrashed()->get();
-                $key = Key::findOrFail($data["key"]);
 
                 foreach ($cronjobs as $cronjob) {
-                    $password = $data["password"];
+                    $passwords = $data;
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookCronJobsApply($cronjob))
                         ->on($server)
-                        ->with($key, $password)
+                        ->passwords($passwords)
                         ->execute();
 
                     if ($result->noAnsibleErrors()) {
@@ -52,6 +51,10 @@ class KeyPasswordActionCronJobsApply extends KeyPasswordAction
                             ->send();
                     }
                 }
+
+                // free memory
+                $data = [];
+                unset($data);
             });
     }
 }

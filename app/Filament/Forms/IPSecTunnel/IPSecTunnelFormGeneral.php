@@ -2,10 +2,12 @@
 
 namespace App\Filament\Forms\IPSecTunnel;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Illuminate\Support\Str;
 
 class IPSecTunnelFormGeneral
@@ -36,11 +38,30 @@ class IPSecTunnelFormGeneral
                             ])
                             ->default("v2")
                             ->required(),
+                        Select::make('auth_by')
+                            ->options([
+                                'psk' => 'Pre-Shared Key',
+                                'pubkey' => 'Public Key',
+                            ])
+                            ->default('psk')
+                            ->live()
+                            ->required(),
+                    ]),
+                Grid::make()
+                    ->columns(1)
+                    ->schema([
                         TextInput::make("psk")
+                            ->visible(fn(Get $get) => $get('auth_by') === 'psk')
                             ->default(fn() => Str::random(60))
-                            ->required()
+                            ->required(false)
                             ->maxLength(255),
-                    ])
+                        FileUpload::make("public_key")
+                            ->visibility('private')
+                            ->directory('public_keys')
+                            ->required(false)
+                            ->visible(fn(Get $get) => $get('auth_by') === 'pubkey')
+                            ->required(),
+                    ]),
             ]);
     }
 }

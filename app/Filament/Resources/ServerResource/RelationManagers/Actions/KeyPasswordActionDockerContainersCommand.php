@@ -42,10 +42,9 @@ class KeyPasswordActionDockerContainersCommand extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $containers = $livewire->getMountedTableActionRecord() ? new Collection([$livewire->getMountedTableActionRecord()]) : $server->dockerContainers;
-                $key = Key::findOrFail($data["key"]);
 
                 // run command in containers
-                $containers->each(fn(DockerContainer $container) => static::runCommand($server, $key, $container, $data));
+                $containers->each(fn(DockerContainer $container) => static::runCommand($server, $container, $data));
             });
     }
 
@@ -72,10 +71,9 @@ class KeyPasswordActionDockerContainersCommand extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data){
                 $server = $livewire->ownerRecord;
                 $containers = $livewire->getSelectedTableRecords();
-                $key = Key::findOrFail($data["key"]);
 
                 // run command in containers
-                $containers->each(fn(DockerContainer $container) => static::runCommand($server, $key, $container, $data));
+                $containers->each(fn(DockerContainer $container) => static::runCommand($server, $container, $data));
             });
     }
 
@@ -87,14 +85,13 @@ class KeyPasswordActionDockerContainersCommand extends KeyPasswordAction
      * @return void
      * @throws \JsonException
      */
-    public static function runCommand(Server $server, Key $key, DockerContainer $container, array &$data)
+    public static function runCommand(Server $server, DockerContainer $container, array &$data)
     {
-        $password = $data["password"];
         $ansible = new Ansible();
         $result = $ansible->play(new PlaybookDockerContainerCommand($container))
             ->on($server)
             ->variable("command", $data["command"])
-            ->with($key, $password)
+            ->passwords($data)
             ->execute();
 
         if ($result->noAnsibleErrors()) {

@@ -26,33 +26,26 @@ class ActionHostCommand extends ActionHost
             ->modalHeading("Run Command on Server")
             ->modalDescription("Enter the command you want to run on the server and confirm.")
             ->form([
-                static::makeKeyPasswordGrid(),
+                static::makeKeyPasswordGrid($host),
                 TextInput::make("command")->label("Command")->required(),
             ])
             ->action(function () use ($host, $context) {
-                // get server and key
-                $key = Key::find($context->mountedActionsData[0]["key"]);
-
                 // ping server
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookHostCommand())
                     ->on($host)
-                    ->with($key, $context->mountedActionsData[0]["password"])
+                    ->passwords($context->mountedActionsData[0])
                     ->variable("command", $context->mountedActionsData[0]["command"])
                     ->execute();
 
                 // notify user
                 if ($result->noAnsibleErrors()) {
-                    Notification::make()
-                        ->title($result->getLog()->first_success_message)
-                        ->success()
-                        ->send();
+                    dd($result->getLog()->first_success_message);
                 } else {
-                    Notification::make()
-                        ->title($result->getLog()->first_error_message)
-                        ->danger()
-                        ->send();
+                    dd($result->getLog()->first_error_message);
                 }
             });
     }
 }
+
+

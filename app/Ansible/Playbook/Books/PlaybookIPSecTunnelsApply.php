@@ -18,6 +18,7 @@ class PlaybookIPSecTunnelsApply extends Playbook
      */
     protected string $directory = "ipsec-tunnels.apply";
 
+    protected string $publicKeyFolder;
     protected string $ipsecConfFilePath;
     protected string $ipsecSecretsFilePath;
     protected string $netplanFilePath;
@@ -51,6 +52,10 @@ class PlaybookIPSecTunnelsApply extends Playbook
         if($this->isOnServer()){
             $ansible->variable("iptables_command", $this->getIpTablesCommands());
         }
+
+        // build public key folder
+        $this->buildPublicKeyFolder($ansible, $process);
+        $ansible->variable("folder_public_keys", $this->publicKeyFolder);
 
         // build ipsec.conf
         $this->buildIPSecConf($ansible, $process);
@@ -90,6 +95,21 @@ class PlaybookIPSecTunnelsApply extends Playbook
         return parent::cleanup($ansible, $process);
     }
 
+    private function buildPublicKeyFolder(Ansible $ansible, Process $process): void
+    {
+        $this->publicKeyFolder = $this->newTemporaryFolder();
+
+        $this->tunnels->each(function(IPSecTunnel $tunnel) {
+            if(!$tunnel->hasPublicKey()) {
+                return;
+            }
+
+            $fileName = "peer-{$tunnel->id}.pub";
+
+            File::put("{$this->publicKeyFolder}/{$fileName}", $tunnel->getPublicKeyContent());
+        });
+    }
+
     /**
      * @param Ansible $ansible
      * @param Process $process
@@ -97,7 +117,7 @@ class PlaybookIPSecTunnelsApply extends Playbook
      */
     private function buildIPSecConf(Ansible $ansible, Process $process)
     {
-        $this->ipsecConfFilePath = $this->newTemporyFile();
+        $this->ipsecConfFilePath = $this->newTemporaryFile();
 
         // build ipsec.conf
         $content = <<<EOF
@@ -129,7 +149,7 @@ EOF;
      */
     private function buildIPSecSecrets(Ansible $ansible, Process $process)
     {
-        $this->ipsecSecretsFilePath = $this->newTemporyFile();
+        $this->ipsecSecretsFilePath = $this->newTemporaryFile();
 
         // build ipsec.secrets
         $content = <<<EOF
@@ -142,6 +162,7 @@ EOF;
 
 # auto generated secrets by cloud conductor
 
+: RSA /etc/ipsec.d/keys/server.key
 
 EOF;
 
@@ -161,7 +182,7 @@ EOF;
      */
     private function buildNetplan(Ansible $ansible, Process $process)
     {
-        $this->netplanFilePath = $this->newTemporyFile();
+        $this->netplanFilePath = $this->newTemporaryFile();
 
         // build netplan
         $content = <<<EOF
@@ -192,7 +213,7 @@ EOF;
      */
     private function buildHealthCheckScript(Ansible $ansible, Process $process)
     {
-        $this->healthCheckScriptFilePath = $this->newTemporyFile();
+        $this->healthCheckScriptFilePath = $this->newTemporaryFile();
 
         // build script
         $content = "#!/bin/bash\n";
@@ -244,7 +265,7 @@ EOF;
      */
     private function buildIptablesPersistentScript(Ansible $ansible, Process $process)
     {
-        $this->iptablesPersistentScriptFilePath = $this->newTemporyFile();
+        $this->iptablesPersistentScriptFilePath = $this->newTemporaryFile();
 
         // build script
         $content = <<<EOF
@@ -277,6 +298,8 @@ EOF;;
         File::delete($this->ipsecSecretsFilePath);
         File::delete($this->netplanFilePath);
         File::delete($this->healthCheckScriptFilePath);
+
+        File::deleteDirectory($this->publicKeyFolder);
 
         if($this->isOnServer()){
             File::delete($this->iptablesPersistentScriptFilePath);

@@ -36,10 +36,9 @@ class KeyPasswordActionDockerContainersStart extends KeyPasswordAction
                 // get server, containers and key
                 $server = $livewire->ownerRecord;
                 $containers = $livewire->getMountedTableActionRecord() ? new Collection([$livewire->getMountedTableActionRecord()]) : $server->dockerContainers;
-                $key = Key::findOrFail($data["key"]);
 
                 // restart containers
-                $containers->each(fn(DockerContainer $container) => static::restartContainer($server, $key, $container, $data));
+                $containers->each(fn(DockerContainer $container) => static::restartContainer($server, $container, $data));
             });
     }
 
@@ -60,10 +59,9 @@ class KeyPasswordActionDockerContainersStart extends KeyPasswordAction
                 // get server, containers and key
                 $server = $livewire->ownerRecord;
                 $containers = $livewire->getSelectedTableRecords();
-                $key = Key::findOrFail($data["key"]);
 
                 // restart containers
-                $containers->each(fn(DockerContainer $container) => static::restartContainer($server, $key, $container, $data));
+                $containers->each(fn(DockerContainer $container) => static::restartContainer($server, $container, $data));
             });
     }
 
@@ -75,13 +73,12 @@ class KeyPasswordActionDockerContainersStart extends KeyPasswordAction
      * @return void
      * @throws JsonException
      */
-    protected static function restartContainer(Server $server, Key $key, DockerContainer $container, array &$data)
+    protected static function restartContainer(Server $server, DockerContainer $container, array &$data)
     {
-        $password = $data["password"];
         $ansible = new Ansible();
         $result = $ansible->play(new PlaybookDockerContainerStart($container))
             ->on($server)
-            ->with($key, $password)
+            ->passwords($data)
             ->execute();
 
         if ($result->noAnsibleErrors()) {

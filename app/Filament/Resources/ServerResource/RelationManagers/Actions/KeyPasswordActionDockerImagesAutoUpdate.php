@@ -30,14 +30,12 @@ class KeyPasswordActionDockerImagesAutoUpdate extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $images = $server->dockerImages;
-                $key = Key::findOrFail($data["key"]);
 
                 foreach ($images as $image) {
-                    $password = $data["password"];
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookDockerImageAutoUpdate($image))
                         ->on($server)
-                        ->with($key, $password)
+                        ->passwords($data)
                         ->execute();
 
                     if ($result->noAnsibleErrors()) {

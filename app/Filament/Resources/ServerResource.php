@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Server\ServerFormAuthentication;
 use App\Filament\Forms\Server\ServerFormGeneral;
 use App\Filament\Forms\Server\ServerFormJumpHost;
 use App\Filament\Forms\Server\ServerFormReverseProxy;
@@ -36,6 +37,9 @@ class ServerResource extends Resource
                         Tab::make("General")
                             ->icon("heroicon-o-server")
                             ->schema([ServerFormGeneral::make()]),
+                        Tab::make("Authentication")
+                            ->icon("heroicon-o-key")
+                            ->schema([ServerFormAuthentication::make()]),
                         Tab::make("Schedules")
                             ->icon("heroicon-o-clock")
                             ->schema([ServerFormSchedules::make()]),
@@ -66,6 +70,10 @@ class ServerResource extends Resource
                         "zero_ssl" => "ZeroSSL",
                         default => $state,
                     })
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('key.name')
+                    ->default('-')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('jumpHost.name')

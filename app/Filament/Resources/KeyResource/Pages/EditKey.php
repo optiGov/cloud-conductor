@@ -25,7 +25,10 @@ class EditKey extends EditRecord
                 ->icon('heroicon-o-exclamation-triangle')
                 ->action(function() {
                     $this->record->encryptKey($this->mountedActionsData[0]["password"]);
-                    $this->notify("success", "Key encrypted successfully.");
+                    Notification::make()
+                        ->title("Key encrypted successfully.")
+                        ->success()
+                        ->send();
                 })
                 ->requiresConfirmation()
                 ->modalDescription("Choose a new password for this key. Keep it safe. You won't be able to recover it.")
@@ -49,9 +52,15 @@ class EditKey extends EditRecord
                 ->action(function(){
                     try {
                         $this->record->decryptKey($this->mountedActionsData[0]["password"]);
-                        $this->notify("warning", "Key decrypted successfully.</br>Please set a new password immediately.");
+                        Notification::make()
+                            ->title("Key decrypted successfully.</br>Please set a new password immediately.")
+                            ->warning()
+                            ->send();
                     } catch (\Exception $e) {
-                        $this->notify("danger", "The password you entered is incorrect.");
+                        Notification::make()
+                            ->title("The password you entered is incorrect.")
+                            ->danger()
+                            ->send();
                     }
                 })
                 ->color("gray")

@@ -1,0 +1,9 @@
+- hosts: "{{ host }}"
+  gather_facts: no
+  become: yes
+  tasks:
+
+    - name: "Get the content of the public key file [/etc/ipsec.d/keys/server.pub]"
+      slurp:
+          src: "/etc/ipsec.d/keys/server.pub"
+      register: public_key

@@ -1,22 +1,51 @@
 - hosts: "{{ host }}"
   gather_facts: yes
+  become: yes
   tasks:
 
+    - name: Create directories for keys
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+      loop:
+        - /etc/ipsec.d/keys
+
+    - name: Generate server private key
+      command: "bash -c 'ipsec pki --gen --type rsa --size 4096 --outform pem > /etc/ipsec.d/keys/server.key'"
+      args:
+        creates: /etc/ipsec.d/keys/server.key
+
+    - name: Generate server public key
+      command: "bash -c 'ipsec pki --pub --in /etc/ipsec.d/keys/server.key --type rsa --outform pem > /etc/ipsec.d/keys/server.pub'"
+      args:
+        creates: /etc/ipsec.d/keys/server.pub
+
+    - name: Ensure permissions on key files
+      file:
+        path: "{{ item }}"
+        mode: '0600'
+      loop:
+        - /etc/ipsec.d/keys/server.key
+        - /etc/ipsec.d/keys/server.pub
+
     - name: "Update and Upgrade apt packages as sudo on {{ host }}"
-      become: yes
       apt:
         update_cache: yes
         upgrade: yes
         cache_valid_time: 3600
 
     - name: "Install strongswan-starter package via apt as sudo on {{ host }}"
-      become: yes
       apt:
         name: strongswan-starter
         state: present
 
+    - name: "Install strongswan-pki package via apt as sudo on {{ host }}"
+      apt:
+        name: strongswan-pki
+        state: present
+
     - name: "Ensure required packages for Docker are installed"
-      become: yes
       apt:
         name:
           - apt-transport-https
@@ -27,7 +56,6 @@
         update_cache: yes
 
     - name: "Download and format Docker's GPG key"
-      become: yes
       shell: |
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         chmod 0644 /usr/share/keyrings/docker-archive-keyring.gpg
@@ -35,41 +63,37 @@
         creates: /usr/share/keyrings/docker-archive-keyring.gpg
 
     - name: "Set up the Docker repository"
-      become: yes
       copy:
         content: |
           deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
         dest: /etc/apt/sources.list.d/docker.list
 
     - name: "Update apt cache with Docker repository"
-      become: yes
       apt:
         update_cache: true
 
     - name: "Install Docker and dependencies"
-      become: yes
       apt:
         name:
           - docker-ce
           - docker-ce-cli
           - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
         state: latest
 
     - name: "Ensure Docker service is running and enabled"
-      become: yes
       service:
         name: docker
         state: started
         enabled: true
 
     - name: "Install unattended-upgrades package via apt as sudo on {{ host }}"
-      become: yes
       apt:
         name: unattended-upgrades
         state: present
 
     - name: "Configure unattended-upgrades package via apt as sudo on {{ host }}"
-      become: yes
       template:
         src: "../../playbook-files/unattended-upgrades/50unattended-upgrades"
         dest: "/etc/apt/apt.conf.d/50unattended-upgrades"
@@ -78,7 +102,6 @@
         mode: 0644
 
     - name: "Create `/usr/local/share/cloud-conductor` directory"
-      become: yes
       file:
         path: "/usr/local/share/cloud-conductor"
         state: directory
@@ -87,7 +110,6 @@
         mode: 0755
 
     - name: "Create `/usr/local/share/cloud-conductor/scripts` directory"
-      become: yes
       file:
         path: "/usr/local/share/cloud-conductor/scripts"
         state: directory
@@ -96,7 +118,6 @@
         mode: 0755
 
     - name: "Remove all but the first line which includes PasswordAuthentication from sshd_config"
-      become: yes
       replace:
         path: "/etc/ssh/sshd_config"
         after: "PasswordAuthentication"
@@ -104,14 +125,12 @@
         replace: ""
 
     - name: "Replace the first line which includes PasswordAuthentication from sshd_config"
-      become: yes
       replace:
         path: "/etc/ssh/sshd_config"
         regexp: "^(.*)PasswordAuthentication(.*)$"
         replace: "PasswordAuthentication no"
 
-    - name: "Restart sshd"
-      become: yes
+    - name: "Restart ssh"
       service:
-        name: sshd
+        name: ssh
         state: restarted

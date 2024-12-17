@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\CronJob;
 use App\Models\DockerContainer;
+use App\Models\DockerNetwork;
 use App\Models\IPSecTunnel;
 use App\Models\JumpHost;
 use App\Models\Key;
@@ -32,7 +33,7 @@ class StatsOverview extends BaseWidget
                 ->description('Total docker containers managed by the system.')
                 ->url('/admin/server')
                 ->icon('heroicon-o-cube'),
-            Stat::make('Networks', DockerContainer::count())
+            Stat::make('Networks', DockerNetwork::count())
                 ->description('Total docker networks managed by the system.')
                 ->url('/admin/server')
                 ->icon('heroicon-o-globe-alt'),

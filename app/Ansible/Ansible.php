@@ -10,6 +10,7 @@ use App\Models\Host;
 use App\Models\Key;
 use App\Models\Server;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use JsonException;
@@ -33,9 +34,9 @@ class Ansible
     protected Key $key;
 
     /**
-     * @var string
+     * @var string[]
      */
-    protected string $password;
+    protected array $passwords;
 
     /**
      * @var array
@@ -90,15 +91,45 @@ class Ansible
     }
 
     /**
-     * @param Key $key
-     * @param string $password
+     * @param array $passwords
      * @return Ansible
      */
-    public function with(Key $key, string &$password): static
+    public function passwords(array &$passwords): static
     {
-        $this->key = $key;
-        $this->password = &$password;
+        $this->passwords = &$passwords;
         return $this;
+    }
+
+    private function getKeys(): Collection
+    {
+        $keys = collect([$this->host->key]);
+
+        $jumpHost = $this->host->jumpHost;
+        while ($jumpHost) {
+            $keys->push($jumpHost->key);
+            $jumpHost = $jumpHost->jumpHost;
+        }
+
+        return $keys;
+    }
+
+    private function getPasswordForKey(Key $key): string
+    {
+        return $this->passwords["password_" . $key->id] ?? $this->passwords['password'];
+    }
+
+    private function decryptKeys(): void
+    {
+        $this->getKeys()->each(function (Key $key) {
+            $key->decryptKey($this->getPasswordForKey($key));
+        });
+    }
+
+    private function encryptKeys(): void
+    {
+        $this->getKeys()->each(function (Key $key) {
+            $key->encryptKey($this->getPasswordForKey($key));
+        });
     }
 
     /**
@@ -109,8 +140,19 @@ class Ansible
         // generate path
         $this->hostFilePath = storage_path("app/tmp/" . Str::uuid());
 
+        $jumpHost = $this->host->jumpHost;
+        $jumpHostConfiguration = "";
+        if($jumpHost){
+            $jumpHostConfiguration = "ansible_ssh_extra_args='-o ProxyCommand=\"ssh -W %h:%p -q {$jumpHost->username}@{$jumpHost->host} -i {$jumpHost->key->getPath()}\"'";
+        }
+
+        $fileContent = <<<EOF
+[server]
+{$this->host->host} ansible_ssh_private_key_file={$this->host->key->getPath()} ansible_user={$this->host->username} $jumpHostConfiguration
+EOF;
+
         // create file
-        File::put($this->hostFilePath, "[server]\n" . $this->host->host . " ansible_ssh_private_key_file=" . $this->key->getPath() . " ansible_user=" . $this->key->username);
+        File::put($this->hostFilePath, $fileContent);
 
         // return self
         return $this;
@@ -163,17 +205,17 @@ class Ansible
         $process->argument($this->playbook->getPath());
 
         // decrypt key
-        $this->key->decryptKey($this->password);
+        $this->decryptKeys();
 
         // execute process
         $result = $process->execute();
 
         // encrypt key
-        $this->key->encryptKey($this->password);
+        $this->encryptKeys();
 
-        // remove password
-        $this->password = "";
-        unset($this->password);
+        // clear passwords
+        $this->passwords = [];
+        unset($this->passwords);
 
         // call playbook cleanup
         $this->playbook->cleanup($this, $process);
@@ -184,7 +226,7 @@ class Ansible
         // log the result
         $log = $this->log(
             $this->host,
-            $this->key,
+            $this->host->key,
             auth()->user(),
             $process->getCommand(),
             $result->asArray()

@@ -31,20 +31,16 @@ class ActionServerConfigure extends ActionHost
             ->modalHeading("Apply Configuration to Server")
             ->modalDescription("Click confirm to update the packages and apply the configuration to the server.")
             ->form([
-                static::makeKeyPasswordGrid(),
+                static::makeKeyPasswordGrid($host),
             ])
             ->action(function () use ($host, $context) {
-                // get server and key
-                $key = Key::find($context->mountedActionsData[0]["key"]);
-
                 // run playbook
-                $password = $context->mountedActionsData[0]["password"];
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookServerConfigure())
                     ->on($host)
                     ->variable("automatic_reboot", $host->unattended_upgrades_enabled ? "true" : "false")
                     ->variable("automatic_reboot_time", Carbon::parse($host->unattended_upgrades_time)->format("H:i"))
-                    ->with($key, $password)
+                    ->passwords($context->mountedActionsData[0])
                     ->execute();
 
                 // notify user

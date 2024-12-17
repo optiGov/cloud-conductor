@@ -65,7 +65,7 @@ class PlaybookLocalIPAddressesApply extends Playbook
      */
     private function buildNetplan(Ansible $ansible, Process $process)
     {
-        $this->netplanFilePath = $this->newTemporyFile();
+        $this->netplanFilePath = $this->newTemporaryFile();
 
         // build netplan
         $content = <<<EOF

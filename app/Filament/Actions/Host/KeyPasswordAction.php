@@ -35,17 +35,8 @@ abstract class KeyPasswordAction
     protected static function makeKeyPasswordGrid(): Component
     {
         return Grid::make()
-            ->columns(2)
+            ->columns(1)
             ->schema([
-                Select::make("key")
-                    ->options(
-                        Key::all()->mapWithKeys(function ($key) {
-                            return [$key->id => $key->name];
-                        })->toArray()
-                    )
-                    ->default(fn() => Key::first()->id)
-                    ->required()
-                    ->label("Key"),
                 TextInput::make("password")
                     ->type("password")
                     ->required()

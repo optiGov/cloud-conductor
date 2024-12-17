@@ -31,12 +31,11 @@ class KeyPasswordActionRMIPSecTunnelsStart extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $ipsecTunnels = $livewire->getMountedTableActionRecord() ? new Collection([$livewire->getMountedTableActionRecord()]) : $server->ipsecTunnels;
-                $key = Key::findOrFail($data["key"]);
 
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookIPSecTunnelsStart($ipsecTunnels))
                     ->on($server)
-                    ->with($key, $data["password"])
+                    ->passwords($data)
                     ->execute();
 
                 if ($result->noAnsibleErrors()) {

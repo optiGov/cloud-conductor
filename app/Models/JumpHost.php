@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
@@ -14,11 +15,12 @@ use Illuminate\Support\Collection;
  * @property string $host
  * @property boolean $unattended_upgrades_enabled
  * @property string|null $unattended_upgrades_time
+ * @property Key|null $key
  * @property Collection<IPSecTunnel> $ipsecTunnels
  * @property Collection<LocalIpAddress> $localIpAddresses
  * @property Collection<Server> $servers
  */
-class JumpHost extends Model implements Host
+class JumpHost extends Host
 {
     use HasFactory;
 
@@ -54,5 +56,10 @@ class JumpHost extends Model implements Host
     public function servers(): HasMany
     {
         return $this->hasMany(Server::class);
+    }
+
+    public function key(): BelongsTo
+    {
+        return $this->belongsTo(Key::class);
     }
 }

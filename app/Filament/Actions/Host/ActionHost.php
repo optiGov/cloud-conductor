@@ -15,32 +15,34 @@ abstract class ActionHost
 {
     /**
      * @param Host $host
-     * @param array $context->mountedActionsData[0]
+     * @param array $context ->mountedActionsData[0]
      * @return Action
      */
     abstract public static function make(Host $host, EditRecord $context): Action;
 
     /**
+     * @param Host $host
      * @return Component
      */
-    protected static function makeKeyPasswordGrid(): Component
+    protected static function makeKeyPasswordGrid(Host $host): Component
     {
+        // collect all keys
+        $keys = collect([$host->key]);
+
+        $jumpHost = $host->jumpHost;
+        while ($jumpHost) {
+            $keys->push($jumpHost->key);
+            $jumpHost = $jumpHost->jumpHost;
+        }
+
         return Grid::make()
-            ->columns(2)
-            ->schema([
-                Select::make("key")
-                    ->options(
-                        Key::all()->mapWithKeys(function ($key) {
-                            return [$key->id => $key->name];
-                        })->toArray()
-                    )
-                    ->default(fn() => Key::first()->id)
-                    ->required()
-                    ->label("Key"),
-                TextInput::make("password")
-                    ->type("password")
-                    ->required()
-                    ->label("Password"),
-            ]);
+            ->columns(1)
+            ->schema($keys->map(fn(Key $key) => TextInput::make("password_{$key->id}")
+                ->type("password")
+                ->required()
+                ->autocomplete('off')
+                ->label("Password ({$key->name})")
+            )->toArray(),
+            );
     }
 }

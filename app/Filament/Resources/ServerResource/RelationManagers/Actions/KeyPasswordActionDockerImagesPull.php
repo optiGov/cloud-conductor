@@ -30,14 +30,13 @@ class KeyPasswordActionDockerImagesPull extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $images = $server->dockerImages;
-                $key = Key::findOrFail($data["key"]);
 
                 foreach ($images as $image) {
-                    $password = $data["password"];
+                    $passwords = $data;
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookDockerImagePull($image))
                         ->on($server)
-                        ->with($key, $password)
+                        ->passwords($passwords)
                         ->execute();
 
                     if ($result->noAnsibleErrors()) {
@@ -52,6 +51,10 @@ class KeyPasswordActionDockerImagesPull extends KeyPasswordAction
                             ->send();
                     }
                 }
+
+                // free memory
+                $data = [];
+                unset($data);
             });
     }
 }

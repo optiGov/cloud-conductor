@@ -1,15 +1,24 @@
 - hosts: "{{ host }}"
   gather_facts: no
+  become: yes
   tasks:
 
+    - name: "Copy public keys from {{ folder_public_keys }} to /etc/ipsec.d/keys"
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/ipsec.d/keys/"
+        owner: root
+        group: root
+        mode: 0600
+      with_fileglob:
+        - "{{ folder_public_keys }}/*.pub"
+
     - name: "Delete interfaces {{ interfaces }} if they exist"
-      become: true
       shell: "ip link del {{ item }}"
       loop: "{{ interfaces }}"
       ignore_errors: true
 
     - name: "Copy `charon.conf` to `/etc/strongswan.d/charon.conf`"
-      become: true
       template:
         src: "../../playbook-files/ipsec/charon.conf"
         dest: "/etc/strongswan.d/charon.conf"
@@ -18,7 +27,6 @@
         mode: 0644
 
     - name: "Copy `ipsec.conf` from {{ file_ipsec_conf }} to `/etc/ipsec.conf`"
-      become: true
       template:
         src: "{{ file_ipsec_conf }}"
         dest: "/etc/ipsec.conf"
@@ -27,7 +35,6 @@
         mode: 0644
 
     - name: "Copy `ipsec.secrets` from {{ file_ipsec_secrets }} to `/etc/ipsec.secrets`"
-      become: true
       template:
         src: "{{ file_ipsec_secrets }}"
         dest: "/etc/ipsec.secrets"
@@ -36,7 +43,6 @@
         mode: 0600
 
     - name: "Copy `cloud-conductor.yaml` from {{ file_netplan }} to `/etc/netplan/01-cloud-conductor.yaml`"
-      become: true
       template:
         src: "{{ file_netplan }}"
         dest: "/etc/netplan/01-cloud-conductor.yaml"
@@ -45,28 +51,23 @@
         mode: 0644
 
     - name: "Apply strongswan configuration and read secrets"
-      become: true
       shell: "ipsec update && ipsec rereadsecrets"
       register: strongswan_restart
 
     - name: "Generate and apply new netplan configuration"
-      become: true
       shell: "netplan generate && netplan apply"
       register: netplan_restart
 
     - name: "Run iptables command `{{ item }}`"
-      become: true
       shell: "{{ item }}"
       loop: "{{ iptables_command }}"
       when: iptables_command is defined
 
     - name: "Restart systemd-networkd"
-      become: true
       shell: "systemctl restart systemd-networkd"
       register: systemd_networkd_restart
 
     - name: "Copy `ipsec-tunnel-health-check.sh` script from {{ file_health_check }} to `/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh`"
-      become: true
       template:
         src: "{{ file_health_check }}"
         dest: "/usr/local/share/cloud-conductor/scripts/ipsec-tunnel-health-check.sh"
@@ -75,7 +76,6 @@
         mode: 0644
 
     - name: "Create cronjob `ipsec-tunnel-health-check` every 5 minutes"
-      become: true
       ansible.builtin.cron:
         name: "ipsec-tunnel-health-check"
         minute: "*/5"
@@ -83,7 +83,6 @@
         state: present
 
     - name: "Copy `iptables-persistent.sh` script from {{ file_iptables_persistent }} to `/usr/local/share/cloud-conductor/scripts/iptables-persistent.sh`"
-      become: true
       template:
         src: "{{ file_iptables_persistent }}"
         dest: "/usr/local/share/cloud-conductor/scripts/iptables-persistent.sh"
@@ -93,7 +92,6 @@
       when: iptables_command is defined
 
     - name: "Create cronjob `iptables-persistent` at reboot"
-      become: true
       ansible.builtin.cron:
         name: "iptables-persistent"
         special_time: reboot

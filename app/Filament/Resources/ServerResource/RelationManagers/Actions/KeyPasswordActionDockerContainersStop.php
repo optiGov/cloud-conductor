@@ -30,14 +30,12 @@ class KeyPasswordActionDockerContainersStop extends KeyPasswordAction
             ->action(function (RelationManager $livewire, array $data) use ($table) {
                 $server = $livewire->ownerRecord;
                 $containers = $livewire->getMountedTableActionRecord() ? [$livewire->getMountedTableActionRecord()] : $server->dockerContainers;
-                $key = Key::findOrFail($data["key"]);
 
                 foreach ($containers as $container) {
-                    $password = $data["password"];
                     $ansible = new Ansible();
                     $result = $ansible->play(new PlaybookDockerContainerStop($container))
                         ->on($server)
-                        ->with($key, $password)
+                        ->passwords($data)
                         ->execute();
 
 

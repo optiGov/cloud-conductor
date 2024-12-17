@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 
 /**
  * @property-read integer $id
@@ -128,6 +129,19 @@ EOF;
 
             });
         }
+
+        $authBy = $this->auth_by === 'psk' ? 'secret' : 'pubkey';
+
+        $rsaKeySection = "";
+
+        if($authBy === 'pubkey') {
+            $rsaKeySection = <<<EOF
+        leftrsasigkey=/etc/ipsec.d/keys/server.pub
+        rightrsasigkey=/etc/ipsec.d/keys/peer-{$this->id}.pub
+
+EOF;
+        }
+
         $config = <<<EOF
 conn {$this->name}
         keyexchange=ike{$this->ike_version}
@@ -141,13 +155,12 @@ conn {$this->name}
         rightsubnet={$remoteSubnet}
         ikelifetime={$this->ike_lifetime}s
         keylife={$this->key_lifetime}s
-        authby=secret
+        authby=$authBy
         auto=add
         mark={$this->getMark()}
+$rsaKeySection
 $additionalConfigurations
 EOF;
-
-
 
         return $config;
     }
@@ -216,5 +229,15 @@ EOF;
         }
 
         return $connectionNames;
+    }
+
+    public function hasPublicKey(): bool
+    {
+        return $this->public_key !== null;
+    }
+
+    public function getPublicKeyContent(): string
+    {
+        return File::get(storage_path('app/public/' . $this->public_key));
     }
 }

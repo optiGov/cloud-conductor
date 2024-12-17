@@ -33,7 +33,7 @@ class KeyResource extends Resource
         return $form
             ->schema([
                 Card::make()
-                    ->columns(2)
+                    ->columns(1)
                     ->schema([
                         TextInput::make("name")
                             ->placeholder("Name of the key")
@@ -44,9 +44,6 @@ class KeyResource extends Resource
                             ->autofocus()
                             ->required()
                             ->unique(static::getModel(), "name"),
-                        TextInput::make("username")
-                            ->placeholder("Name of the user on the server")
-                            ->required(),
                     ]),
                 Card::make()
                     ->columns(2)

@@ -31,18 +31,14 @@ class ActionReverseProxyRun extends ActionHost
             ->modalHeading("Apply Reverse-Proxy Configuration")
             ->modalDescription("Click confirm to apply the configuration and start the reverse-proxy.")
             ->form([
-                static::makeKeyPasswordGrid(),
+                static::makeKeyPasswordGrid($host),
             ])
             ->action(function () use ($host, $context) {
-                // get server and key
-                $key = Key::find($context->mountedActionsData[0]["key"]);
-
                 // run playbook
-                $password = $context->mountedActionsData[0]["password"];
                 $ansible = new Ansible();
                 $result = $ansible->play(new PlaybookReverseProxyRun($host))
                     ->on($host)
-                    ->with($key, $password)
+                    ->passwords($context->mountedActionsData[0])
                     ->execute();
 
                 // notify user

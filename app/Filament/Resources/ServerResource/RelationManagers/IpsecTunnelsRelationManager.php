@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\ServerResource\RelationManagers;
 
 use App\Filament\Actions\IPSecTunnel\KeyPasswordActionIPSecTunnelsApply;
+use App\Filament\Actions\IPSecTunnel\KeyPasswordActionIPSecTunnelsPublicKey;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormEncryption;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormGeneral;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormLifetime;
 use App\Filament\Forms\IPSecTunnel\IPSecTunnelFormNetworking;
 use App\Filament\Resources\ServerResource\RelationManagers\Actions\KeyPasswordActionRMIPSecTunnelsStart;
 use App\Models\DockerNetwork;
+use App\Models\IPSecTunnel;
 use App\Models\Server;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
@@ -77,11 +79,14 @@ class IpsecTunnelsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('remote_ip'),
                 Tables\Columns\TextColumn::make('ike_version'),
+                Tables\Columns\TextColumn::make('auth_by')
+                    ->formatStateUsing(fn(IPSecTunnel $tunnel) => $tunnel->auth_by === 'psk' ? 'Pre-Shared Key' : 'Public Key'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
+                KeyPasswordActionIPSecTunnelsPublicKey::make($table),
                 KeyPasswordActionIPSecTunnelsApply::make($table),
                 KeyPasswordActionRMIPSecTunnelsStart::make($table),
                 Tables\Actions\CreateAction::make(),
